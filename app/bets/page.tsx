@@ -1,0 +1,245 @@
+'use client'
+import { useState } from 'react'
+import { Bet } from '@/types/bet'
+import { fmt, fmtPnL } from '@/utils/currency'
+import { useBets } from '@/hooks/useBets'
+import Navbar from '@/components/Navbar'
+import AddBetModal from '@/components/AddBetModal'
+import BottomNav from '@/components/BottomNav'
+
+const RESULT_COLOR = {
+  win:     'var(--color-win)',
+  loss:    'var(--color-loss)',
+  pending: 'var(--color-pending)',
+  void:    'var(--color-void)',
+}
+const RESULT_BG = {
+  win:     'rgba(52,211,153,0.08)',
+  loss:    'rgba(248,113,113,0.08)',
+  pending: 'rgba(251,191,36,0.08)',
+  void:    'rgba(148,163,184,0.08)',
+}
+const RESULT_BORDER = {
+  win:     'rgba(52,211,153,0.3)',
+  loss:    'rgba(248,113,113,0.3)',
+  pending: 'rgba(251,191,36,0.3)',
+  void:    'rgba(148,163,184,0.2)',
+}
+const RESULT_LABEL = { win: 'Win', loss: 'Loss', pending: 'Pending', void: 'Void' }
+const RESULT_ICON  = { win: '✅', loss: '❌', pending: '⏳', void: '↩️' }
+const PICKER_LABEL: Record<string, string> = { pablo: '👤 Pablo', thomas: '👥 Thomas', both: '🤝 Both' }
+
+function BetCard({ bet, onEdit, onDelete }: { bet: Bet; onEdit: (b: Bet) => void; onDelete: (id: string) => void }) {
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const c = RESULT_COLOR[bet.result]
+
+  const handleDelete = () => {
+    if (confirmDelete) { onDelete(bet.id) }
+    else { setConfirmDelete(true); setTimeout(() => setConfirmDelete(false), 3000) }
+  }
+
+  return (
+    <div style={{
+      background: RESULT_BG[bet.result],
+      border: `1px solid ${RESULT_BORDER[bet.result]}`,
+      borderRadius: 16,
+      padding: '16px 18px',
+      display: 'flex', flexDirection: 'column', gap: 10,
+    }}>
+      {/* Top row: match + result badge */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.3, marginBottom: 3 }}>{bet.match}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+            <span style={{
+              fontSize: 10, fontWeight: 600, color: 'var(--color-accent)',
+              background: 'rgba(129,140,248,0.1)', border: '1px solid rgba(129,140,248,0.2)',
+              borderRadius: 5, padding: '2px 7px',
+            }}>{bet.league.replace('UEFA ', '').replace('FIFA ', '')}</span>
+            <span style={{ fontSize: 11, color: 'var(--color-muted)' }}>{bet.date.slice(5)}</span>
+            {bet.bookmaker && <span style={{ fontSize: 11, color: 'var(--color-muted)', opacity: 0.7 }}>· {bet.bookmaker}</span>}
+          </div>
+        </div>
+        <span className={`badge badge-${bet.result}`} style={{ flexShrink: 0, fontSize: 12, padding: '4px 10px' }}>
+          {RESULT_ICON[bet.result]} {RESULT_LABEL[bet.result]}
+        </span>
+      </div>
+
+      {/* Prediction row */}
+      <div style={{ fontSize: 13, color: 'var(--color-muted)', padding: '8px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 8 }}>
+        <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>{bet.prediction}</span>
+        <span style={{ marginLeft: 8, opacity: 0.6 }}>· {bet.betType}</span>
+      </div>
+
+      {/* Stats row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div>
+          <div style={{ fontSize: 10, color: 'var(--color-muted)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Odds</div>
+          <div className="num" style={{ fontSize: 16, fontWeight: 700 }}>{bet.odds.toFixed(2)}</div>
+        </div>
+        <div>
+          <div style={{ fontSize: 10, color: 'var(--color-muted)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Stake</div>
+          <div className="num" style={{ fontSize: 16, fontWeight: 700 }}>{fmt(bet.stake)}</div>
+        </div>
+        <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
+          <div style={{ fontSize: 10, color: 'var(--color-muted)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            {bet.result === 'pending' ? 'To win' : 'P&L'}
+          </div>
+          <div className="num" style={{ fontSize: 20, fontWeight: 800, color: c, letterSpacing: '-0.02em' }}>
+            {bet.result === 'pending'
+              ? fmtPnL(parseFloat(((bet.stake * bet.odds) - bet.stake).toFixed(2)))
+              : fmtPnL(bet.profit)}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer: picker + actions */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 6, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>
+          {bet.picker ? PICKER_LABEL[bet.picker] : '—'}
+          {bet.fundedBy && bet.fundedBy !== 'bank' && (
+            <span style={{ marginLeft: 6, opacity: 0.6 }}>· funded by {bet.fundedBy}</span>
+          )}
+        </span>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button onClick={() => onEdit(bet)} style={{
+            padding: '5px 12px', borderRadius: 7, fontSize: 12, cursor: 'pointer', fontWeight: 600,
+            background: 'rgba(129,140,248,0.1)', border: '1px solid rgba(129,140,248,0.25)',
+            color: 'var(--color-accent)',
+          }}>Edit</button>
+          <button onClick={handleDelete} style={{
+            padding: '5px 12px', borderRadius: 7, fontSize: 12, cursor: 'pointer', fontWeight: 600,
+            background: confirmDelete ? 'rgba(248,113,113,0.2)' : 'rgba(255,255,255,0.05)',
+            border: confirmDelete ? '1px solid rgba(248,113,113,0.4)' : '1px solid rgba(255,255,255,0.08)',
+            color: confirmDelete ? 'var(--color-loss)' : 'var(--color-muted)',
+          }}>{confirmDelete ? 'Sure?' : '✕'}</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+type FilterResult = 'all' | 'win' | 'loss' | 'pending'
+type SortBy = 'date' | 'profit' | 'odds'
+
+export default function BetsPage() {
+  const { bets, addBet, deleteBet, updateBet, loaded, stats } = useBets()
+  const [showModal, setShowModal]   = useState(false)
+  const [editingBet, setEditingBet] = useState<Bet | null>(null)
+  const [filter, setFilter]         = useState<FilterResult>('all')
+  const [sortBy, setSortBy]         = useState<SortBy>('date')
+  const [dateRange, setDateRange]   = useState<'all' | '30d' | '90d'>('all')
+
+  if (!loaded) return (
+    <>
+      <Navbar onAddBet={() => setShowModal(true)} />
+      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted)', fontSize: 14 }}>Loading…</div>
+    </>
+  )
+
+  const cutoff = dateRange === '30d' ? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    : dateRange === '90d' ? new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    : null
+
+  const filtered = bets
+    .filter(b => filter === 'all' || b.result === filter)
+    .filter(b => !cutoff || b.date >= cutoff)
+    .sort((a, b) => {
+      if (a.result === 'pending' && b.result !== 'pending') return -1
+      if (a.result !== 'pending' && b.result === 'pending') return 1
+      if (sortBy === 'date')   return b.date.localeCompare(a.date)
+      if (sortBy === 'profit') return b.profit - a.profit
+      if (sortBy === 'odds')   return b.odds - a.odds
+      return 0
+    })
+
+  const filterTabs: { key: FilterResult; label: string; count: number }[] = [
+    { key: 'all',     label: 'All',     count: bets.length },
+    { key: 'pending', label: '⏳',      count: stats.pending },
+    { key: 'win',     label: '✅',      count: stats.wins },
+    { key: 'loss',    label: '❌',      count: stats.losses },
+  ]
+
+  return (
+    <>
+      <Navbar onAddBet={() => setShowModal(true)} />
+
+      {/* Sticky filter bar */}
+      <div style={{
+        position: 'sticky',
+        top: 'calc(56px + env(safe-area-inset-top))',
+        zIndex: 39,
+        background: 'rgba(9,9,15,0.96)',
+        backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+      }}>
+        <div style={{
+          maxWidth: 700, margin: '0 auto',
+          padding: '10px 16px',
+          display: 'flex', gap: 8, alignItems: 'center', overflowX: 'auto',
+        }}>
+          {filterTabs.map(({ key, label, count }) => {
+            const active = filter === key
+            return (
+              <button key={key} className="pill-btn" onClick={() => setFilter(key)} style={{
+                padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
+                background: active ? 'rgba(129,140,248,0.18)' : 'rgba(255,255,255,0.04)',
+                border: active ? '1px solid rgba(129,140,248,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                color: active ? 'var(--color-accent)' : 'var(--color-muted)',
+              }}>
+                {label} <span style={{ opacity: 0.7, fontSize: 11 }}>{count}</span>
+              </button>
+            )
+          })}
+
+          <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
+
+          {(['30d', '90d', 'all'] as const).map(r => {
+            const active = dateRange === r
+            return (
+              <button key={r} className="pill-btn" onClick={() => setDateRange(r)} style={{
+                padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
+                background: active ? 'rgba(129,140,248,0.12)' : 'rgba(255,255,255,0.04)',
+                border: active ? '1px solid rgba(129,140,248,0.3)' : '1px solid rgba(255,255,255,0.08)',
+                color: active ? 'var(--color-accent)' : 'var(--color-muted)',
+              }}>{r === 'all' ? 'All time' : r}</button>
+            )
+          })}
+
+          <select value={sortBy} onChange={e => setSortBy(e.target.value as SortBy)}
+            style={{ marginLeft: 'auto', padding: '6px 10px', borderRadius: 8, fontSize: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--color-muted)', cursor: 'pointer', outline: 'none', flexShrink: 0 }}>
+            <option value="date">↓ Date</option>
+            <option value="profit">↓ Profit</option>
+            <option value="odds">↓ Odds</option>
+          </select>
+        </div>
+      </div>
+
+      <main className="page-main" style={{
+        maxWidth: 700, margin: '0 auto',
+        padding: '16px 16px 100px',
+        display: 'flex', flexDirection: 'column', gap: 12,
+      }}>
+        {filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-muted)' }}>
+            No bets {filter !== 'all' ? 'in this category' : 'yet — add your first one!'}
+          </div>
+        ) : (
+          filtered.map(bet => (
+            <BetCard
+              key={bet.id}
+              bet={bet}
+              onEdit={setEditingBet}
+              onDelete={deleteBet}
+            />
+          ))
+        )}
+      </main>
+
+      {showModal  && <AddBetModal onClose={() => setShowModal(false)} onAdd={addBet} />}
+      {editingBet && <AddBetModal onClose={() => setEditingBet(null)} onAdd={addBet} editBet={editingBet} onUpdate={updateBet} />}
+
+      <BottomNav />
+    </>
+  )
+}
