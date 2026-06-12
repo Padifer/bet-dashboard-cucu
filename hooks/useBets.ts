@@ -145,7 +145,7 @@ function computeMonthlyPnL(bets: Bet[]): MonthlyPnL[] {
 const BANKROLL_KEY = 'bet-dashboard-bankroll-start'
 
 async function fetchBets(): Promise<Bet[]> {
-  const { data } = await supabase.from('bets').select('*').order('date', { ascending: true })
+  const { data } = await supabase.from('bets_cucu').select('*').order('date', { ascending: true })
   return (data ?? []).map(rowToBet)
 }
 
@@ -160,7 +160,7 @@ export function useBets() {
 
     const channel = supabase
       .channel(channelName)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'bets' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bets_cucu' }, () => {
         fetchBets().then(setBets)
       })
       .subscribe()
@@ -176,9 +176,9 @@ export function useBets() {
     localStorage.setItem(BANKROLL_KEY, String(amount))
   }
 
-  const addBet    = async (bet: Omit<Bet, 'id'>)             => { await supabase.from('bets').insert(betToRow(bet)) }
-  const deleteBet = async (id: string)                        => { await supabase.from('bets').delete().eq('id', id) }
-  const updateBet = async (id: string, updates: Partial<Bet>) => { await supabase.from('bets').update(betToRow(updates)).eq('id', id) }
+  const addBet    = async (bet: Omit<Bet, 'id'>)             => { await supabase.from('bets_cucu').insert(betToRow(bet)) }
+  const deleteBet = async (id: string)                        => { await supabase.from('bets_cucu').delete().eq('id', id) }
+  const updateBet = async (id: string, updates: Partial<Bet>) => { await supabase.from('bets_cucu').update(betToRow(updates)).eq('id', id) }
 
   const settleBet = async (id: string, result: 'win' | 'loss' | 'void') => {
     const bet = bets.find(b => b.id === id)

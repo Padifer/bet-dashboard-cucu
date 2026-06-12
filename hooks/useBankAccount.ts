@@ -34,7 +34,7 @@ function txToRow(tx: Omit<BankTransaction, 'id'>): Record<string, unknown> {
 // ── Hook ───────────────────────────────────────────────────────────────────────
 
 async function fetchTxs(): Promise<BankTransaction[]> {
-  const { data } = await supabase.from('bank_transactions').select('*').order('created_at', { ascending: true })
+  const { data } = await supabase.from('bank_transactions_cucu').select('*').order('created_at', { ascending: true })
   return (data ?? []).map(rowToTx)
 }
 
@@ -48,7 +48,7 @@ export function useBankAccount() {
 
     const channel = supabase
       .channel(channelName)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'bank_transactions' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bank_transactions_cucu' }, () => {
         fetchTxs().then(setTransactions)
       })
       .subscribe()
@@ -57,15 +57,15 @@ export function useBankAccount() {
   }, [channelName])
 
   const addTransaction = async (tx: Omit<BankTransaction, 'id'>) => {
-    await supabase.from('bank_transactions').insert(txToRow(tx))
+    await supabase.from('bank_transactions_cucu').insert(txToRow(tx))
   }
 
   const deleteTransaction = async (id: string) => {
-    await supabase.from('bank_transactions').delete().eq('id', id)
+    await supabase.from('bank_transactions_cucu').delete().eq('id', id)
   }
 
   const deleteGroup = async (groupId: string) => {
-    await supabase.from('bank_transactions').delete().eq('group_id', groupId)
+    await supabase.from('bank_transactions_cucu').delete().eq('group_id', groupId)
   }
 
   const sign      = (t: BankTransaction) => (t.type === 'deposit' ? 1 : -1)
