@@ -27,7 +27,7 @@ const RESULT_BORDER = {
 }
 const RESULT_LABEL = { win: 'Win', loss: 'Loss', pending: 'Pending', void: 'Void' }
 const RESULT_ICON  = { win: '✅', loss: '❌', pending: '⏳', void: '↩️' }
-const PICKER_LABEL: Record<string, string> = { pablo: '👤 Pablo', thomas: '👥 Thomas', both: '🤝 Both' }
+const PICKER_LABEL: Record<string, string> = { pablo: '👤 Pablo', alberto: '👥 Alberto', both: '🤝 Both' }
 
 function BetCard({ bet, onEdit, onDelete }: { bet: Bet; onEdit: (b: Bet) => void; onDelete: (id: string) => void }) {
   const [confirmDelete, setConfirmDelete] = useState(false)

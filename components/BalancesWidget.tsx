@@ -14,14 +14,14 @@ function computeBalances(bets: Bet[], transactions: BankTransaction[]) {
 
   const sign = (t: BankTransaction) => t.type === 'deposit' ? 1 : -1
   const pabloBank  = bankTxs.filter(t => t.person === 'Pablo').reduce((s, t) => s + sign(t) * t.amount, 0)
-  const thomasBank = bankTxs.filter(t => t.person === 'Thomas').reduce((s, t) => s + sign(t) * t.amount, 0)
+  const albertoBank = bankTxs.filter(t => t.person === 'Alberto').reduce((s, t) => s + sign(t) * t.amount, 0)
 
   const settledBets = bets.filter(b => b.result !== 'pending' && b.result !== 'void')
   // Exclude personally-funded losses from betShare: the stake for those
-  // is already captured in frontedForPablo/frontedForThomas below.
+  // is already captured in frontedForPablo/frontedForAlberto below.
   // Wins are included (stake came back from bookie, only profit is shared).
   const betsForPnL = settledBets.filter(b =>
-    !(b.fundedBy === 'thomas' && b.result === 'loss') &&
+    !(b.fundedBy === 'alberto' && b.result === 'loss') &&
     !(b.fundedBy === 'pablo'  && b.result === 'loss')
   )
   const totalBetPnL = betsForPnL.reduce((s, b) => s + b.profit, 0)
@@ -34,30 +34,30 @@ function computeBalances(bets: Bet[], transactions: BankTransaction[]) {
   // Void bets return the stake to the funder, so the obligation cancels.
   // Wins are excluded: the bookie returned the stake, so no fronting remains.
   const inFlightBets = bets.filter(b => b.result !== 'void')
-  const thomasFrontedForPablo = inFlightBets
-    .filter(b => b.fundedBy === 'thomas' && b.result !== 'win')
+  const albertoFrontedForPablo = inFlightBets
+    .filter(b => b.fundedBy === 'alberto' && b.result !== 'win')
     .reduce((s, b) => s + b.stake / 2, 0)
-  const pabloFrontedForThomas = inFlightBets
+  const pabloFrontedForAlberto = inFlightBets
     .filter(b => b.fundedBy === 'pablo' && b.result !== 'win')
     .reduce((s, b) => s + b.stake / 2, 0)
 
   // Explicit debts (inter-person advances)
   const pabloOwes  = debts.filter(t => t.person === 'Pablo').reduce((s, t) => s + t.amount, 0)
-  const thomasOwes = debts.filter(t => t.person === 'Thomas').reduce((s, t) => s + t.amount, 0)
+  const albertoOwes = debts.filter(t => t.person === 'Alberto').reduce((s, t) => s + t.amount, 0)
 
-  const pabloNet  = pabloBank  + betShare - pabloOwes  + thomasOwes - thomasFrontedForPablo + pabloFrontedForThomas
-  const thomasNet = thomasBank + betShare - thomasOwes + pabloOwes  + thomasFrontedForPablo - pabloFrontedForThomas
+  const pabloNet  = pabloBank  + betShare - pabloOwes  + albertoOwes - albertoFrontedForPablo + pabloFrontedForAlberto
+  const albertoNet = albertoBank + betShare - albertoOwes + pabloOwes  + albertoFrontedForPablo - pabloFrontedForAlberto
 
-  const diff = pabloNet - thomasNet
+  const diff = pabloNet - albertoNet
   const settlement = Math.abs(diff) / 2
-  const debtor   = Math.abs(diff) > 0.005 ? (diff > 0 ? 'Thomas' : 'Pablo')  : null
-  const creditor = Math.abs(diff) > 0.005 ? (diff > 0 ? 'Pablo'  : 'Thomas') : null
+  const debtor   = Math.abs(diff) > 0.005 ? (diff > 0 ? 'Alberto' : 'Pablo')  : null
+  const creditor = Math.abs(diff) > 0.005 ? (diff > 0 ? 'Pablo'  : 'Alberto') : null
 
   return {
-    pabloBank, thomasBank, betShare, totalBetPnL, pendingStake,
-    pabloOwes, thomasOwes,
-    thomasFrontedForPablo, pabloFrontedForThomas,
-    pabloNet, thomasNet, settlement, debtor, creditor,
+    pabloBank, albertoBank, betShare, totalBetPnL, pendingStake,
+    pabloOwes, albertoOwes,
+    albertoFrontedForPablo, pabloFrontedForAlberto,
+    pabloNet, albertoNet, settlement, debtor, creditor,
   }
 }
 
@@ -76,28 +76,28 @@ function Line({ label, value, color, bold }: { label: string; value: number | nu
 
 export default function BalancesWidget({ bets, transactions }: Props) {
   const {
-    pabloBank, thomasBank, betShare, totalBetPnL, pendingStake,
-    pabloOwes, thomasOwes,
-    thomasFrontedForPablo, pabloFrontedForThomas,
-    pabloNet, thomasNet, settlement, debtor, creditor,
+    pabloBank, albertoBank, betShare, totalBetPnL, pendingStake,
+    pabloOwes, albertoOwes,
+    albertoFrontedForPablo, pabloFrontedForAlberto,
+    pabloNet, albertoNet, settlement, debtor, creditor,
   } = computeBalances(bets, transactions)
 
   const people = [
     {
       name: 'Pablo',  icon: '👤', accent: '#818cf8',
-      bankVal: pabloBank,  owes: pabloOwes,  isOwed: thomasOwes,
-      frontedByOther: thomasFrontedForPablo,
-      frontedForOther: pabloFrontedForThomas,
-      otherName: 'Thomas',
+      bankVal: pabloBank,  owes: pabloOwes,  isOwed: albertoOwes,
+      frontedByOther: albertoFrontedForPablo,
+      frontedForOther: pabloFrontedForAlberto,
+      otherName: 'Alberto',
       net: pabloNet,
     },
     {
-      name: 'Thomas', icon: '👥', accent: '#a78bfa',
-      bankVal: thomasBank, owes: thomasOwes, isOwed: pabloOwes,
-      frontedByOther: pabloFrontedForThomas,
-      frontedForOther: thomasFrontedForPablo,
+      name: 'Alberto', icon: '👥', accent: '#a78bfa',
+      bankVal: albertoBank, owes: albertoOwes, isOwed: pabloOwes,
+      frontedByOther: pabloFrontedForAlberto,
+      frontedForOther: albertoFrontedForPablo,
       otherName: 'Pablo',
-      net: thomasNet,
+      net: albertoNet,
     },
   ]
 

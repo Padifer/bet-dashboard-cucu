@@ -13,7 +13,7 @@ interface BetsTableProps {
 
 const RESULT_LABELS = { win: 'Win', loss: 'Loss', pending: 'Pending', void: 'Void' }
 const RESULT_ICONS  = { win: '✅', loss: '❌', pending: '⏳', void: '↩️' }
-const PICKER_LABELS = { pablo: '👤 Pablo', thomas: '👥 Thomas', both: '🤝 Both' }
+const PICKER_LABELS = { pablo: '👤 Pablo', alberto: '👥 Alberto', both: '🤝 Both' }
 
 const LEG_RESULT_ORDER: LegResult[] = ['win', 'half-win', 'half-loss', 'loss', 'void', 'pending']
 

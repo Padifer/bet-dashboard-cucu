@@ -11,14 +11,7 @@ interface CompConfig {
 }
 
 const COMPETITIONS: CompConfig[] = [
-  { code: 'WC',  name: 'World Cup',        short: 'WC',        color: '#f5a623', priority: 1 },
-  { code: 'CL',  name: 'Champions League', short: 'UCL',       color: '#1a56db', priority: 2 },
-  { code: 'EC',  name: 'Euro 2024',        short: 'EURO',      color: '#003399', priority: 3 },
-  { code: 'PL',  name: 'Premier League',   short: 'PL',        color: '#38003c', priority: 4 },
-  { code: 'SA',  name: 'Serie A',          short: 'Serie A',   color: '#009246', priority: 5 },
-  { code: 'PD',  name: 'La Liga',          short: 'LaLiga',    color: '#c60b1e', priority: 6 },
-  { code: 'BL1', name: 'Bundesliga',       short: 'Bundesliga',color: '#d3101d', priority: 7 },
-  { code: 'FL1', name: 'Ligue 1',          short: 'Ligue 1',   color: '#0055a4', priority: 8 },
+  { code: 'WC', name: 'FIFA World Cup 2026', short: 'WC26', color: '#F5A623', priority: 1 },
 ]
 
 export interface UpcomingMatch {

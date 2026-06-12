@@ -51,10 +51,10 @@ export default function BottomNav() {
           left: 0,
           right: 0,
           zIndex: 50,
-          background: 'rgba(9,9,15,0.97)',
+          background: 'rgba(5,13,26,0.97)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderTop: '1px solid rgba(255,255,255,0.07)',
+          borderTop: '1px solid rgba(245,166,35,0.1)',
           paddingBottom: 'env(safe-area-inset-bottom)',
           paddingLeft: 'env(safe-area-inset-left)',
           paddingRight: 'env(safe-area-inset-right)',
@@ -62,7 +62,6 @@ export default function BottomNav() {
         }}
       >
         <Tab href="/" icon="⌂" label="Home" active={path === '/'} />
-        <Tab href="/bets" icon="📋" label="Bets" active={path === '/bets'} />
 
         {/* Center elevated + button */}
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -74,8 +73,8 @@ export default function BottomNav() {
               width: 48,
               height: 48,
               borderRadius: '50%',
-              background: 'var(--color-accent)',
-              color: '#fff',
+              background: 'linear-gradient(135deg, #F5A623 0%, #E8930E 100%)',
+              color: '#050D1A',
               border: 'none',
               fontSize: 24,
               fontWeight: 700,
@@ -85,14 +84,14 @@ export default function BottomNav() {
               justifyContent: 'center',
               cursor: 'pointer',
               transform: 'translateY(-10px)',
-              boxShadow: '0 8px 24px rgba(129,140,248,0.45), 0 2px 6px rgba(0,0,0,0.3)',
+              boxShadow: '0 8px 24px rgba(245,166,35,0.5), 0 2px 6px rgba(0,0,0,0.4)',
             }}
           >
             +
           </button>
         </div>
 
-        <Tab href="/tips" icon="💡" label="Tips" active={path === '/tips'} />
+        <Tab href="/bets" icon="📋" label="Bets" active={path === '/bets'} />
       </nav>
 
       {showModal && <AddBetModal onClose={() => setShowModal(false)} onAdd={addBet} />}

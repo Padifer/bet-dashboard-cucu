@@ -38,7 +38,7 @@ export default function Dashboard() {
     stats, bankrollData, roiByCompetition, roiByBetType, monthlyPnL,
     bankrollStart, setBankrollStart,
   } = useBets()
-  const { transactions, addTransaction, deleteTransaction, deleteGroup, total: bankTotal, pabloTotal, thomasTotal, loaded: bankLoaded } = useBankAccount()
+  const { transactions, addTransaction, deleteTransaction, deleteGroup, total: bankTotal, pabloTotal, albertoTotal, loaded: bankLoaded } = useBankAccount()
   const [showModal, setShowModal] = useState(false)
   const [editingBet, setEditingBet] = useState<Bet | null>(null)
 
@@ -74,7 +74,7 @@ export default function Dashboard() {
     .reduce((sum, b) => b.result === 'pending' ? sum - b.stake : sum + b.profit, 0)
   const adjustedBankTotal  = bankTotal  + bankFundedImpact
   const adjustedPabloTotal = pabloTotal + bankFundedImpact / 2
-  const adjustedThomasTotal = thomasTotal + bankFundedImpact / 2
+  const adjustedAlbertoTotal = albertoTotal + bankFundedImpact / 2
 
   const roiSign = stats.roi >= 0 ? '+' : ''
   const roiColor = stats.roi >= 0 ? 'var(--color-win)' : 'var(--color-loss)'
@@ -88,10 +88,10 @@ export default function Dashboard() {
         position: 'sticky',
         top: 'calc(56px + env(safe-area-inset-top))',
         zIndex: 39,
-        background: 'rgba(9,9,15,0.96)',
+        background: 'rgba(5,13,26,0.97)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        borderBottom: '1px solid rgba(245,166,35,0.1)',
       }}>
         <div style={{
           maxWidth: 1200, margin: '0 auto',
@@ -173,7 +173,7 @@ export default function Dashboard() {
             transactions={transactions}
             total={adjustedBankTotal}
             pabloTotal={adjustedPabloTotal}
-            thomasTotal={adjustedThomasTotal}
+            albertoTotal={adjustedAlbertoTotal}
             onAdd={addTransaction}
             onDelete={deleteTransaction}
             onDeleteGroup={deleteGroup}
@@ -181,12 +181,12 @@ export default function Dashboard() {
           <BalancesWidget bets={bets} transactions={transactions} />
         </div>
 
-        {/* Pablo vs Thomas head-to-head */}
-        {(stats.pabloStats.wins + stats.pabloStats.losses > 0 || stats.thomasStats.wins + stats.thomasStats.losses > 0) && (
+        {/* Pablo vs Alberto head-to-head */}
+        {(stats.pabloStats.wins + stats.pabloStats.losses > 0 || stats.albertoStats.wins + stats.albertoStats.losses > 0) && (
           <div className="grid-headtohead" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             {[
               { name: 'Pablo', s: stats.pabloStats, icon: '👤' },
-              { name: 'Thomas', s: stats.thomasStats, icon: '👥' },
+              { name: 'Alberto', s: stats.albertoStats, icon: '👥' },
             ].map(({ name, s, icon }) => {
               const roiColor = s.roi >= 0 ? 'var(--color-win)' : 'var(--color-loss)'
               const fmtStat = (n: number) => Number.isInteger(n) ? String(n) : n.toFixed(1)
@@ -234,7 +234,7 @@ export default function Dashboard() {
       <button className="btn-primary hide-on-mobile" onClick={() => setShowModal(true)} style={{
         position: 'fixed', bottom: 24, right: 24, width: 52, height: 52,
         borderRadius: '50%', fontSize: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 6px 24px rgba(129,140,248,0.35)', zIndex: 30,
+        boxShadow: '0 6px 24px rgba(245,166,35,0.4)', zIndex: 30,
       }} aria-label="Add bet">+</button>
 
       {showModal && <AddBetModal onClose={() => setShowModal(false)} onAdd={addBet} />}

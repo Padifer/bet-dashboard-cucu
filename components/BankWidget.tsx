@@ -8,7 +8,7 @@ interface Props {
   transactions: BankTransaction[]
   total: number
   pabloTotal: number
-  thomasTotal: number
+  albertoTotal: number
   onAdd: (tx: Omit<BankTransaction, 'id'>) => void
   onDelete: (id: string) => void
   onDeleteGroup: (groupId: string) => void
@@ -20,7 +20,7 @@ function fmtDatetime(iso: string) {
     d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 }
 
-export default function BankWidget({ transactions, total, pabloTotal, thomasTotal, onAdd, onDelete, onDeleteGroup }: Props) {
+export default function BankWidget({ transactions, total, pabloTotal, albertoTotal, onAdd, onDelete, onDeleteGroup }: Props) {
   const [expanded, setExpanded] = useState(false)
   const [showModal, setShowModal] = useState(false)
 
@@ -67,7 +67,7 @@ export default function BankWidget({ transactions, total, pabloTotal, thomasTota
           <div style={{ display: 'flex', gap: 20 }}>
             {[
               { name: 'Pablo', icon: '👤', val: pabloTotal },
-              { name: 'Thomas', icon: '👥', val: thomasTotal },
+              { name: 'Alberto', icon: '👥', val: albertoTotal },
             ].map(({ name, icon, val }) => (
               <div key={name} style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 11, color: 'var(--color-muted)', marginBottom: 2 }}>{icon} {name}</div>

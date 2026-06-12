@@ -36,7 +36,7 @@ export default function AddTransactionModal({ onClose, onAdd }: Props) {
 
   const amtNum = parseFloat(amount)
   const isValid = Number.isFinite(amtNum) && amtNum > 0 && amtNum < 1_000_000_000
-  const creditor: TransactionPerson = debtor === 'Pablo' ? 'Thomas' : 'Pablo'
+  const creditor: TransactionPerson = debtor === 'Pablo' ? 'Alberto' : 'Pablo'
   const isDebt = tab === 'debt'
 
   // Rounding-safe split: halfA + halfB always equals amtNum exactly (to the cent)
@@ -54,7 +54,7 @@ export default function AddTransactionModal({ onClose, onAdd }: Props) {
     } else if (person === 'Both') {
       const groupId = newGroupId()
       onAdd({ type: tab as TransactionType, amount: halfA, person: 'Pablo',  groupId, note: noteVal, createdAt })
-      onAdd({ type: tab as TransactionType, amount: halfB, person: 'Thomas', groupId, note: noteVal, createdAt })
+      onAdd({ type: tab as TransactionType, amount: halfB, person: 'Alberto', groupId, note: noteVal, createdAt })
     } else {
       onAdd({ type: tab as TransactionType, amount: amtNum, person, note: noteVal, createdAt })
     }
@@ -102,7 +102,7 @@ export default function AddTransactionModal({ onClose, onAdd }: Props) {
               <div>
                 <label style={labelStyle}>Who owes?</label>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  {(['Pablo', 'Thomas'] as TransactionPerson[]).map(p => (
+                  {(['Pablo', 'Alberto'] as TransactionPerson[]).map(p => (
                     <button key={p} type="button" onClick={() => setDebtor(p)} style={{
                       flex: 1, padding: '10px 6px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
                       border: debtor === p ? '1.5px solid rgba(251,191,36,0.6)' : '1px solid rgba(255,255,255,0.08)',
@@ -136,7 +136,7 @@ export default function AddTransactionModal({ onClose, onAdd }: Props) {
                 <div style={{ display: 'flex', gap: 8 }}>
                   {([
                     { v: 'Pablo'  as PersonOption, label: '👤 Pablo' },
-                    { v: 'Thomas' as PersonOption, label: '👥 Thomas' },
+                    { v: 'Alberto' as PersonOption, label: '👥 Alberto' },
                     { v: 'Both'   as PersonOption, label: '🤝 Both 50/50' },
                   ]).map(({ v, label }) => (
                     <button key={v} type="button" onClick={() => setPerson(v)} style={{
@@ -153,7 +153,7 @@ export default function AddTransactionModal({ onClose, onAdd }: Props) {
                 {isValid && (
                   <div style={{ marginTop: 5, fontSize: 12, fontWeight: 600, color: tab === 'deposit' ? 'var(--color-win)' : 'var(--color-loss)' }}>
                     {person === 'Both'
-                      ? `${tab === 'deposit' ? '+' : '−'}${fmt(halfA)} Pablo · ${tab === 'deposit' ? '+' : '−'}${fmt(halfB)} Thomas`
+                      ? `${tab === 'deposit' ? '+' : '−'}${fmt(halfA)} Pablo · ${tab === 'deposit' ? '+' : '−'}${fmt(halfB)} Alberto`
                       : `${tab === 'deposit' ? '+' : '−'}${fmt(amtNum)} for ${person}`}
                   </div>
                 )}

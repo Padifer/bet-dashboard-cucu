@@ -586,8 +586,8 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate }: AddBe
               <div>
                 <label style={labelStyle}>Who picked it?</label>
                 <div style={{ display: 'flex', gap: 6 }}>
-                  {(['pablo', 'thomas', 'both'] as BetPicker[]).map(p => {
-                    const labels = { pablo: '👤 Pablo', thomas: '👥 Thomas', both: '🤝 Both' }
+                  {(['pablo', 'alberto', 'both'] as BetPicker[]).map(p => {
+                    const labels = { pablo: '👤 Pablo', alberto: '👥 Alberto', both: '🤝 Both' }
                     const active = form.picker === p
                     return (
                       <button key={p} type="button" onClick={() => set('picker', p)} style={{
@@ -610,7 +610,7 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate }: AddBe
                   {([
                     { value: 'bank',   label: '🏦 Banco',   accent: '#f5a623' },
                     { value: 'pablo',  label: '👤 Pablo',   accent: 'var(--color-accent)' },
-                    { value: 'thomas', label: '👥 Thomas',  accent: '#a78bfa' },
+                    { value: 'alberto', label: '👥 Alberto',  accent: '#a78bfa' },
                   ] as { value: BetFunder; label: string; accent: string }[]).map(({ value, label, accent }) => {
                     const active = form.fundedBy === value
                     return (

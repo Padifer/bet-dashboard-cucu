@@ -20,17 +20,17 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#09090f",
+  themeColor: "#050D1A",
 };
 
 export const metadata: Metadata = {
-  title: "BetTracker",
-  description: "Sports betting dashboard",
+  title: "WC26 Bets",
+  description: "World Cup 2026 betting dashboard",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "BetTracker",
+    title: "WC26 Bets",
   },
   icons: {
     icon: "/icon.svg",

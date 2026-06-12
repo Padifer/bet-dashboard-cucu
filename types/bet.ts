@@ -1,6 +1,6 @@
 export type BetResult = 'win' | 'loss' | 'void' | 'pending'
-export type BetPicker = 'pablo' | 'thomas' | 'both'
-export type BetFunder = 'bank' | 'pablo' | 'thomas'
+export type BetPicker = 'pablo' | 'alberto' | 'both'
+export type BetFunder = 'bank' | 'pablo' | 'alberto'
 
 // Per-leg results for Asian handicap Mix Parlay settlement
 export type LegResult = 'pending' | 'win' | 'half-win' | 'loss' | 'half-loss' | 'void'
@@ -48,7 +48,7 @@ export interface BetStats {
   currentStreak: number
   currentStreakType: 'win' | 'loss' | null
   pabloStats: { wins: number; losses: number; roi: number; profit: number }
-  thomasStats: { wins: number; losses: number; roi: number; profit: number }
+  albertoStats: { wins: number; losses: number; roi: number; profit: number }
 }
 
 export interface CompetitionStat {

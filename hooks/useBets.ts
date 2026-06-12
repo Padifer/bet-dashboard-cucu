@@ -53,7 +53,7 @@ function betToRow(b: Omit<Bet, 'id'> | Partial<Bet>): Record<string, unknown> {
 
 // ── Stats helpers (unchanged logic) ───────────────────────────────────────────
 
-function pickerStats(bets: Bet[], picker: 'pablo' | 'thomas') {
+function pickerStats(bets: Bet[], picker: 'pablo' | 'alberto') {
   let wins = 0, losses = 0, stake = 0, profit = 0
   for (const b of bets) {
     if (b.result !== 'win' && b.result !== 'loss') continue
@@ -100,7 +100,7 @@ function computeStats(bets: Bet[]): BetStats {
     totalStake, totalReturns, netProfit, roi, wins, losses, voids, pending,
     total: bets.length, currentStreak, currentStreakType,
     pabloStats:  pickerStats(bets, 'pablo'),
-    thomasStats: pickerStats(bets, 'thomas'),
+    albertoStats: pickerStats(bets, 'alberto'),
   }
 }
 
