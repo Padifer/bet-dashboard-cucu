@@ -27,9 +27,9 @@ export default function Navbar({ onAddBet }: NavbarProps) {
   return (
     <nav style={{
       position: 'sticky', top: 0, zIndex: 40,
-      background: 'rgba(5,13,26,0.97)',
-      backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-      borderBottom: '1px solid rgba(245,166,35,0.1)',
+      background: 'rgba(4,6,12,0.95)',
+      backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
+      borderBottom: '1px solid rgba(99,120,200,0.1)',
       paddingTop: 'env(safe-area-inset-top)',
     }}>
       <div style={{

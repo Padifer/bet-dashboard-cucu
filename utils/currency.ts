@@ -1,7 +1,7 @@
-export const CURRENCY_SYMBOL = '฿'
+export const CURRENCY_SYMBOL = '$'
 
 /**
- * Format a THB amount: ฿3,000  /  ฿3,000.50  /  +฿14,627.34
+ * Format a USD amount: $3,000  /  $3,000.50  /  +$14,627.34
  * Uses comma thousands and dot decimal. Trailing zeros are dropped.
  * Pass maxDecimals to force more precision (e.g. 4 for odds-derived values).
  */
@@ -24,12 +24,12 @@ export function fmtPnL(amount: number, maxDecimals = 2): string {
   return (amount >= 0 ? '+' : '−') + fmt(Math.abs(amount), maxDecimals)
 }
 
-/** Short axis label: ฿3K, ฿50K, ฿1.5M */
+/** Short axis label: $3K, $50K, $1.5M */
 export function fmtK(amount: number): string {
   const abs = Math.abs(amount)
   const sign = amount < 0 ? '−' : ''
-  if (abs >= 1_000_000) return `${sign}฿${(abs / 1_000_000).toFixed(1)}M`
-  if (abs >= 10_000)    return `${sign}฿${(abs / 1_000).toFixed(0)}K`
-  if (abs >= 1_000)     return `${sign}฿${(abs / 1_000).toFixed(1)}K`
-  return `${sign}฿${abs.toFixed(0)}`
+  if (abs >= 1_000_000) return `${sign}$${(abs / 1_000_000).toFixed(1)}M`
+  if (abs >= 10_000)    return `${sign}$${(abs / 1_000).toFixed(0)}K`
+  if (abs >= 1_000)     return `${sign}$${(abs / 1_000).toFixed(1)}K`
+  return `${sign}$${abs.toFixed(0)}`
 }

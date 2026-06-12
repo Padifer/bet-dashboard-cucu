@@ -88,10 +88,10 @@ export default function Dashboard() {
         position: 'sticky',
         top: 'calc(56px + env(safe-area-inset-top))',
         zIndex: 39,
-        background: 'rgba(5,13,26,0.97)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(245,166,35,0.1)',
+        background: 'rgba(4,6,12,0.95)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderBottom: '1px solid rgba(99,120,200,0.1)',
       }}>
         <div style={{
           maxWidth: 1200, margin: '0 auto',
