@@ -92,7 +92,7 @@ export async function GET(): Promise<NextResponse<MatchesResponse>> {
   }
 
   const today = new Date()
-  const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
+  const nextWeek = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000)
   const dateFrom = today.toISOString().slice(0, 10)
   const dateTo = nextWeek.toISOString().slice(0, 10)
 

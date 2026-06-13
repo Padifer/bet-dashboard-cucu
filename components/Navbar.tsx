@@ -45,8 +45,10 @@ export default function Navbar({ onAddBet }: NavbarProps) {
         </Link>
 
         <div className="nav-tabs-top" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {tab('/', 'Dashboard')}
+          {tab('/', 'Stats')}
           {tab('/bets', 'Bets')}
+          {tab('/bank', 'Bank')}
+          {tab('/fixtures', 'Fixtures')}
           <button className="btn-primary" onClick={onAddBet} style={{ padding: '7px 16px', fontSize: 13 }}>
             + Add Bet
           </button>

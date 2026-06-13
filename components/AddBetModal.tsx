@@ -9,6 +9,7 @@ interface AddBetModalProps {
   onAdd: (bet: Omit<Bet, 'id'>) => void
   editBet?: Bet
   onUpdate?: (id: string, updates: Partial<Bet>) => void
+  prefill?: { match?: string; odds?: string }
 }
 
 function calcProfit(odds: number, stake: number, result: BetResult): number {
@@ -25,7 +26,7 @@ async function uploadSlip(file: File): Promise<string | null> {
   return supabase.storage.from('bet-slips').getPublicUrl(data.path).data.publicUrl
 }
 
-export default function AddBetModal({ onClose, onAdd, editBet, onUpdate }: AddBetModalProps) {
+export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill }: AddBetModalProps) {
   const isEdit = !!editBet
   const [slipFile, setSlipFile]     = useState<File | null>(null)
   const [slipPreview, setSlipPreview] = useState<string | null>(editBet?.slipUrl ?? null)
@@ -33,11 +34,11 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate }: AddBe
   const fileRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({
     date:     editBet?.date    ?? new Date().toISOString().slice(0, 10),
-    match:    editBet?.match   ?? '',
+    match:    editBet?.match   ?? prefill?.match ?? '',
     league:   editBet?.league  ?? 'FIFA World Cup',
     betType:  editBet?.betType ?? 'Other',
     prediction: editBet?.prediction ?? '',
-    odds:     editBet?.odds  != null ? String(editBet.odds)  : '',
+    odds:     editBet?.odds  != null ? String(editBet.odds)  : (prefill?.odds ?? ''),
     stake:    editBet?.stake != null ? String(editBet.stake) : '',
     result:   (editBet?.result  ?? 'pending') as BetResult,
     picker:   (editBet?.picker  ?? 'both')    as BetPicker,

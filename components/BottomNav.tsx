@@ -10,11 +10,24 @@ export default function BottomNav() {
   const [showModal, setShowModal] = useState(false)
   const { addBet } = useBets()
 
-  const tabs = [
-    { href: '/',     icon: HomeIcon,   label: 'Home'  },
-    { href: '/bets', icon: BetsIcon,   label: 'Bets'  },
-    { href: '/bank', icon: BankIcon,   label: 'Bank'  },
+  const leftTabs  = [
+    { href: '/',          icon: HomeIcon,     label: 'Home'     },
+    { href: '/bets',      icon: BetsIcon,     label: 'Bets'     },
   ]
+  const rightTabs = [
+    { href: '/bank',      icon: BankIcon,     label: 'Bank'     },
+    { href: '/fixtures',  icon: FixturesIcon, label: 'Fixtures' },
+  ]
+
+  const tabStyle = (active: boolean): React.CSSProperties => ({
+    width: 48, height: 46,
+    display: 'flex', flexDirection: 'column',
+    alignItems: 'center', justifyContent: 'center',
+    gap: 3, textDecoration: 'none', borderRadius: 9999,
+    color: active ? 'var(--color-accent)' : 'rgba(255,255,255,0.45)',
+    background: active ? 'rgba(245,166,35,0.1)' : 'transparent',
+    transition: 'color 0.15s, background 0.15s',
+  })
 
   return (
     <>
@@ -26,39 +39,27 @@ export default function BottomNav() {
         zIndex: 50,
         display: 'flex',
         alignItems: 'center',
-        gap: 4,
+        gap: 2,
         background: 'rgba(21, 32, 48, 0.97)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         border: '1px solid rgba(255,255,255,0.1)',
         borderRadius: 9999,
-        padding: '8px 12px',
+        padding: '8px 10px',
         boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3)',
       }}>
-        {/* Left tabs */}
-        {tabs.slice(0, 2).map(({ href, icon: Icon, label }) => {
-          const active = path === href
-          return (
-            <Link key={href} href={href} style={{
-              width: 52, height: 46,
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              gap: 3, textDecoration: 'none', borderRadius: 9999,
-              color: active ? 'var(--color-accent)' : 'rgba(255,255,255,0.45)',
-              background: active ? 'rgba(245,166,35,0.1)' : 'transparent',
-              transition: 'color 0.15s, background 0.15s',
-            }}>
-              <Icon size={20} />
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.04em' }}>{label}</span>
-            </Link>
-          )
-        })}
+        {leftTabs.map(({ href, icon: Icon, label }) => (
+          <Link key={href} href={href} style={tabStyle(path === href)}>
+            <Icon size={18} />
+            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.04em' }}>{label}</span>
+          </Link>
+        ))}
 
         {/* Center + button */}
         <button
           onClick={() => setShowModal(true)}
           style={{
-            width: 48, height: 48,
+            width: 44, height: 44,
             borderRadius: 9999,
             background: 'var(--color-accent)',
             color: '#1A2534',
@@ -77,24 +78,12 @@ export default function BottomNav() {
           +
         </button>
 
-        {/* Right tab */}
-        {tabs.slice(2).map(({ href, icon: Icon, label }) => {
-          const active = path === href
-          return (
-            <Link key={href} href={href} style={{
-              width: 52, height: 46,
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              gap: 3, textDecoration: 'none', borderRadius: 9999,
-              color: active ? 'var(--color-accent)' : 'rgba(255,255,255,0.45)',
-              background: active ? 'rgba(245,166,35,0.1)' : 'transparent',
-              transition: 'color 0.15s, background 0.15s',
-            }}>
-              <Icon size={20} />
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.04em' }}>{label}</span>
-            </Link>
-          )
-        })}
+        {rightTabs.map(({ href, icon: Icon, label }) => (
+          <Link key={href} href={href} style={tabStyle(path === href)}>
+            <Icon size={18} />
+            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.04em' }}>{label}</span>
+          </Link>
+        ))}
       </nav>
 
       {showModal && <AddBetModal onClose={() => setShowModal(false)} onAdd={addBet} />}
@@ -128,6 +117,16 @@ function BankIcon({ size }: { size: number }) {
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
       <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" />
+    </svg>
+  )
+}
+
+function FixturesIcon({ size }: { size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+      <line x1="2" y1="12" x2="22" y2="12" />
     </svg>
   )
 }

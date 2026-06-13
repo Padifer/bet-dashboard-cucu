@@ -162,7 +162,7 @@ export default function AddTransactionModal({ onClose, onAdd }: Props) {
 
             {/* Amount */}
             <div>
-              <label style={labelStyle}>Amount (฿)</label>
+              <label style={labelStyle}>Amount ($)</label>
               <input
                 className="input-dark"
                 type="number"

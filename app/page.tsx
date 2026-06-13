@@ -3,19 +3,14 @@ import { useState } from 'react'
 import { Bet } from '@/types/bet'
 import { fmt, fmtPnL } from '@/utils/currency'
 import { useBets } from '@/hooks/useBets'
-import { useBankAccount } from '@/hooks/useBankAccount'
 import Navbar from '@/components/Navbar'
-import BankWidget from '@/components/BankWidget'
 import StatsCards from '@/components/StatsCards'
 import BankrollChart from '@/components/BankrollChart'
 import WinLossDonut from '@/components/WinLossDonut'
 import ROIByCompetitionChart from '@/components/ROIByCompetitionChart'
 import ROIByBetTypeChart from '@/components/ROIByBetTypeChart'
 import MonthlyPnLChart from '@/components/MonthlyPnLChart'
-import PendingBets from '@/components/PendingBets'
-import BetsTable from '@/components/BetsTable'
 import AddBetModal from '@/components/AddBetModal'
-import BalancesWidget from '@/components/BalancesWidget'
 import BottomNav from '@/components/BottomNav'
 
 function KPIStat({ label, value, color, sub }: { label: string; value: string; color?: string; sub?: string }) {
@@ -34,15 +29,14 @@ function KPIDivider() {
 
 export default function Dashboard() {
   const {
-    bets, addBet, deleteBet, updateBet, settleBet, loaded,
+    bets, addBet, updateBet, loaded,
     stats, bankrollData, roiByCompetition, roiByBetType, monthlyPnL,
     bankrollStart, setBankrollStart,
   } = useBets()
-  const { transactions, addTransaction, deleteTransaction, deleteGroup, total: bankTotal, pabloTotal, albertoTotal, loaded: bankLoaded } = useBankAccount()
   const [showModal, setShowModal] = useState(false)
   const [editingBet, setEditingBet] = useState<Bet | null>(null)
 
-  if (!loaded || !bankLoaded) {
+  if (!loaded) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ color: 'var(--color-muted)', fontSize: 14 }}>Loading…</div>
@@ -68,14 +62,6 @@ export default function Dashboard() {
     ? 'var(--color-loss)'
     : 'var(--color-muted)'
 
-  // Bank-funded bets reduce the bank while pending, add profit on win, reduce stake on loss
-  const bankFundedImpact = bets
-    .filter(b => b.fundedBy === 'bank')
-    .reduce((sum, b) => b.result === 'pending' ? sum - b.stake : sum + b.profit, 0)
-  const adjustedBankTotal  = bankTotal  + bankFundedImpact
-  const adjustedPabloTotal = pabloTotal + bankFundedImpact / 2
-  const adjustedAlbertoTotal = albertoTotal + bankFundedImpact / 2
-
   const roiSign = stats.roi >= 0 ? '+' : ''
   const roiColor = stats.roi >= 0 ? 'var(--color-win)' : 'var(--color-loss)'
 
@@ -97,12 +83,6 @@ export default function Dashboard() {
           display: 'flex', alignItems: 'center', gap: 20,
           overflowX: 'auto',
         }}>
-          {/* Financial group */}
-          <KPIStat
-            label="Bank"
-            value={fmt(adjustedBankTotal)}
-            color={adjustedBankTotal >= 0 ? 'var(--color-win)' : 'var(--color-loss)'}
-          />
           <KPIStat
             label="Net P&L"
             value={fmtPnL(stats.netProfit)}
@@ -113,12 +93,7 @@ export default function Dashboard() {
             value={`${roiSign}${stats.roi.toFixed(1)}%`}
             color={roiColor}
           />
-
-          <div className="kpi-secondary" style={{ display: 'contents' }}>
-            <KPIDivider />
-          </div>
-
-          {/* Performance group */}
+          <KPIDivider />
           <KPIStat
             label="Hit Rate"
             value={`${hitRate}%`}
@@ -126,33 +101,14 @@ export default function Dashboard() {
             sub={`${stats.wins}W · ${stats.losses}L`}
           />
           <div className="kpi-secondary" style={{ display: 'contents' }}>
-            <KPIStat
-              label="Streak"
-              value={streakVal}
-              color={streakColor}
-            />
-            <KPIStat
-              label="Avg Odds"
-              value={avgOdds ?? '—'}
-            />
+            <KPIStat label="Streak" value={streakVal} color={streakColor} />
+            <KPIStat label="Avg Odds" value={avgOdds ?? '—'} />
           </div>
-
-          {/* Open exposure group — only when there are open bets */}
           {stats.pending > 0 && (
             <div className="kpi-secondary" style={{ display: 'contents' }}>
               <KPIDivider />
-              <KPIStat
-                label="Open"
-                value={`${stats.pending} bet${stats.pending !== 1 ? 's' : ''}`}
-                color="var(--color-pending)"
-              />
-              {pendingStake > 0 && (
-                <KPIStat
-                  label="Exposure"
-                  value={fmt(pendingStake)}
-                  color="var(--color-muted)"
-                />
-              )}
+              <KPIStat label="Open" value={`${stats.pending} bet${stats.pending !== 1 ? 's' : ''}`} color="var(--color-pending)" />
+              {pendingStake > 0 && <KPIStat label="Exposure" value={fmt(pendingStake)} color="var(--color-muted)" />}
             </div>
           )}
         </div>
@@ -161,33 +117,18 @@ export default function Dashboard() {
       <main className="page-main" style={{
         position: 'relative', zIndex: 1,
         maxWidth: 1200, margin: '0 auto',
-        padding: '28px 24px 80px',
+        padding: '28px 24px 100px',
         display: 'flex', flexDirection: 'column', gap: 20,
       }}>
 
-        {/* Row 1: Bank (wider) + Balances side by side */}
-        <div className="grid-bank">
-          <BankWidget
-            transactions={transactions}
-            total={adjustedBankTotal}
-            pabloTotal={adjustedPabloTotal}
-            albertoTotal={adjustedAlbertoTotal}
-            onAdd={addTransaction}
-            onDelete={deleteTransaction}
-            onDeleteGroup={deleteGroup}
-          />
-          <BalancesWidget bets={bets} transactions={transactions} />
-        </div>
-
         {/* Pablo vs Alberto head-to-head */}
         {(stats.pabloStats.wins + stats.pabloStats.losses > 0 || stats.albertoStats.wins + stats.albertoStats.losses > 0) && (
-          <div className="grid-headtohead" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             {[
               { name: 'Pablo', s: stats.pabloStats, icon: '👤' },
               { name: 'Alberto', s: stats.albertoStats, icon: '👥' },
             ].map(({ name, s, icon }) => {
-              const roiColor = s.roi >= 0 ? 'var(--color-win)' : 'var(--color-loss)'
-              const fmtStat = (n: number) => Number.isInteger(n) ? String(n) : n.toFixed(1)
+              const rColor = s.roi >= 0 ? 'var(--color-win)' : 'var(--color-loss)'
               const total = s.wins + s.losses
               const winRate = total > 0 ? ((s.wins / total) * 100).toFixed(0) : '0'
               return (
@@ -195,15 +136,13 @@ export default function Dashboard() {
                   <span style={{ fontSize: 24 }}>{icon}</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>{name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--color-muted)' }}>{fmtStat(s.wins)}W / {fmtStat(s.losses)}L · {winRate}% hit</div>
+                    <div style={{ fontSize: 11, color: 'var(--color-muted)' }}>{s.wins}W / {s.losses}L · {winRate}% hit</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div className="num" style={{ fontSize: 18, fontWeight: 800, color: roiColor, letterSpacing: '-0.02em' }}>
+                    <div className="num" style={{ fontSize: 18, fontWeight: 800, color: rColor, letterSpacing: '-0.02em' }}>
                       {s.roi >= 0 ? '+' : ''}{s.roi.toFixed(1)}%
                     </div>
-                    <div className="num" style={{ fontSize: 12, color: roiColor, opacity: 0.8 }}>
-                      {fmtPnL(s.profit)}
-                    </div>
+                    <div className="num" style={{ fontSize: 12, color: rColor, opacity: 0.8 }}>{fmtPnL(s.profit)}</div>
                   </div>
                 </div>
               )
@@ -223,10 +162,6 @@ export default function Dashboard() {
           <ROIByBetTypeChart data={roiByBetType} />
           <MonthlyPnLChart data={monthlyPnL} />
         </div>
-
-        <PendingBets bets={bets} onSettle={settleBet} onUpdateBet={updateBet} />
-
-        <BetsTable bets={bets} onDelete={deleteBet} onEdit={setEditingBet} onUpdateBet={updateBet} />
       </main>
 
       <button className="btn-primary hide-on-mobile" onClick={() => setShowModal(true)} style={{
