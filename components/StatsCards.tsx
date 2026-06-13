@@ -67,7 +67,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
         <StatCard
           label="Total Returns" value={fmt(stats.totalReturns)}
           sub={`Each: ${fmt(stats.totalReturns / 2)}`}
-          color="var(--color-accent)"
+          color={profitColor}
           icon={<Trophy {...iconProps} />}
         />
         <StatCard
