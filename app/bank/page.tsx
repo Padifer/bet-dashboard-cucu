@@ -72,6 +72,7 @@ export default function BankPage() {
   const eachProfit      = parseFloat((eachShareNow - eachContributed).toFixed(2))
   const shareColor      = eachShareNow >= eachContributed ? '#6EC200' : '#E85C2A'
   const pendingStake    = bets.filter(b => b.result === 'pending').reduce((s, b) => s + b.stake, 0)
+  const eachLost        = bets.filter(b => b.result === 'loss').reduce((s, b) => s + b.stake, 0) / 2
 
   function openTx(type: 'deposit' | 'withdrawal') {
     setTxType(type); setShowTxModal(true)
@@ -99,13 +100,13 @@ export default function BankPage() {
           <BigCard
             label="Pablo"
             value={loaded ? fmt(eachShareNow) : '…'}
-            sub={loaded ? `${fmt(eachContributed)} in · ${eachProfit >= 0 ? '+' : ''}${fmt(eachProfit)} profit${pendingStake > 0 ? ` · ${fmt(pendingStake / 2)} at risk` : ''}` : undefined}
+            sub={loaded ? `${fmt(eachContributed)} in · ${eachProfit >= 0 ? '+' : ''}${fmt(eachProfit)} profit${eachLost > 0 ? ` · -${fmt(eachLost)} lost` : ''}${pendingStake > 0 ? ` · ${fmt(pendingStake / 2)} at risk` : ''}` : undefined}
             valueColor={shareColor}
           />
           <BigCard
             label="Alberto"
             value={loaded ? fmt(eachShareNow) : '…'}
-            sub={loaded ? `${fmt(eachContributed)} in · ${eachProfit >= 0 ? '+' : ''}${fmt(eachProfit)} profit${pendingStake > 0 ? ` · ${fmt(pendingStake / 2)} at risk` : ''}` : undefined}
+            sub={loaded ? `${fmt(eachContributed)} in · ${eachProfit >= 0 ? '+' : ''}${fmt(eachProfit)} profit${eachLost > 0 ? ` · -${fmt(eachLost)} lost` : ''}${pendingStake > 0 ? ` · ${fmt(pendingStake / 2)} at risk` : ''}` : undefined}
             light
             valueColor={eachShareNow >= eachContributed ? '#1B6B1B' : '#B03020'}
           />
