@@ -11,28 +11,34 @@ import AddTransactionModal from '@/components/AddTransactionModal'
 import { Bet } from '@/types/bet'
 import { fmt } from '@/utils/currency'
 
-function ActionBtn({
-  label, icon, color, onClick,
-}: { label: string; icon: string; color: string; onClick: () => void }) {
-  const [hover, setHover] = useState(false)
+// Exact same BigCard as the dashboard
+function BigCard({
+  label, value, sub, light = false, valueColor, onClick,
+}: {
+  label: string; value: string; sub?: string
+  light?: boolean; valueColor?: string; onClick?: () => void
+}) {
+  const bg           = light ? '#F0EBE0' : '#223022'
+  const border       = light ? 'rgba(27,43,27,0.1)' : 'rgba(240,235,224,0.07)'
+  const labelColor   = light ? 'rgba(27,43,27,0.4)' : 'rgba(240,235,224,0.4)'
+  const defaultValue = light ? '#1B2B1B' : '#F0EBE0'
+  const subColor     = light ? 'rgba(27,43,27,0.38)' : 'rgba(240,235,224,0.35)'
   return (
-    <button
+    <div
       onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
       style={{
-        flex: 1, padding: '16px 12px', borderRadius: 12, cursor: 'pointer', border: 'none',
-        background: hover ? `${color}CC` : `${color}22`,
-        color: hover ? '#F0EBE0' : color,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-        fontSize: 15, fontWeight: 800, letterSpacing: '0.03em', textTransform: 'uppercase',
-        transition: 'background 0.15s, color 0.15s',
-        outline: `1px solid ${color}44`,
+        background: bg, border: `1px solid ${border}`, borderRadius: 12,
+        padding: '20px 22px', minHeight: 110,
+        cursor: onClick ? 'pointer' : 'default',
+        transition: onClick ? 'filter 0.12s' : undefined,
       }}
+      onMouseEnter={e => { if (onClick) (e.currentTarget as HTMLDivElement).style.filter = 'brightness(1.06)' }}
+      onMouseLeave={e => { if (onClick) (e.currentTarget as HTMLDivElement).style.filter = 'none' }}
     >
-      <span style={{ fontSize: 20 }}>{icon}</span>
-      {label}
-    </button>
+      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: labelColor, marginBottom: 10 }}>{label}</div>
+      <div className="num" style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1, color: valueColor ?? defaultValue }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, marginTop: 8, color: subColor }}>{sub}</div>}
+    </div>
   )
 }
 
@@ -42,10 +48,10 @@ export default function BankPage() {
     transactions, addTransaction, deleteTransaction, deleteGroup,
     total: bankTotal, pabloTotal, albertoTotal, loaded,
   } = useBankAccount()
-  const [showBetModal, setShowBetModal] = useState(false)
-  const [editingBet, setEditingBet] = useState<Bet | null>(null)
-  const [showTxModal, setShowTxModal] = useState(false)
-  const [txType, setTxType] = useState<'deposit' | 'withdrawal'>('deposit')
+  const [showBetModal, setShowBetModal]     = useState(false)
+  const [editingBet,   setEditingBet]       = useState<Bet | null>(null)
+  const [showTxModal,  setShowTxModal]      = useState(false)
+  const [txType,       setTxType]           = useState<'deposit' | 'withdrawal'>('deposit')
 
   const bankFundedImpact = bets
     .filter(b => b.fundedBy === 'bank')
@@ -55,12 +61,12 @@ export default function BankPage() {
   const adjustedPabloTotal   = pabloTotal   + bankFundedImpact / 2
   const adjustedAlbertoTotal = albertoTotal + bankFundedImpact / 2
 
-  const isPositive = adjustedBankTotal >= 0
-  const heroColor  = isPositive ? '#6EC200' : '#E85C2A'
+  const bankColor  = adjustedBankTotal >= 0 ? '#1B6B1B' : '#B03020'
+  const pabloColor = adjustedPabloTotal >= 0 ? '#6EC200' : '#E85C2A'
+  const alberColor = adjustedAlbertoTotal >= 0 ? '#1B6B1B' : '#B03020'
 
   function openTx(type: 'deposit' | 'withdrawal') {
-    setTxType(type)
-    setShowTxModal(true)
+    setTxType(type); setShowTxModal(true)
   }
 
   return (
@@ -68,58 +74,58 @@ export default function BankPage() {
       <Navbar onAddBet={() => setShowBetModal(true)} />
 
       <main className="page-main" style={{
-        maxWidth: 700, margin: '0 auto',
-        padding: '24px 20px 100px',
-        display: 'flex', flexDirection: 'column', gap: 16,
+        maxWidth: 900, margin: '0 auto',
+        padding: '20px 20px 100px',
+        display: 'flex', flexDirection: 'column', gap: 12,
       }}>
 
-        {/* ── Balance hero ───────────────────────────────────────────────── */}
-        <div style={{
-          background: '#223022', border: '1px solid rgba(240,235,224,0.07)', borderRadius: 16,
-          padding: '28px 28px 24px', textAlign: 'center',
-        }}>
-          <div style={{
-            fontSize: 11, fontWeight: 800, letterSpacing: '0.12em',
-            textTransform: 'uppercase', color: 'rgba(240,235,224,0.4)', marginBottom: 10,
-          }}>
-            Bank Account
-          </div>
-          {!loaded ? (
-            <div style={{ height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted)', fontSize: 14 }}>
-              Loading…
-            </div>
-          ) : (
-            <>
-              <div className="num" style={{
-                fontSize: 56, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1,
-                color: heroColor,
-              }}>
-                {fmt(adjustedBankTotal)}
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 32, marginTop: 18 }}>
-                {[
-                  { name: 'Pablo',   val: adjustedPabloTotal },
-                  { name: 'Alberto', val: adjustedAlbertoTotal },
-                ].map(({ name, val }) => (
-                  <div key={name} style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(240,235,224,0.35)', marginBottom: 3 }}>{name}</div>
-                    <div className="num" style={{ fontSize: 20, fontWeight: 800, color: val >= 0 ? '#6EC200' : '#E85C2A' }}>{fmt(val)}</div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+        {/* ── Row 1: bento balance grid (same pattern as dashboard) ──────── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 12 }}>
+          <BigCard
+            label="Bank Balance"
+            value={loaded ? fmt(adjustedBankTotal) : '…'}
+            sub={loaded ? `${transactions.length} transactions` : undefined}
+            light
+            valueColor={bankColor}
+          />
+          <BigCard
+            label="Pablo"
+            value={loaded ? fmt(adjustedPabloTotal) : '…'}
+            sub="net contributed"
+            valueColor={pabloColor}
+          />
+          <BigCard
+            label="Alberto"
+            value={loaded ? fmt(adjustedAlbertoTotal) : '…'}
+            sub="net contributed"
+            light
+            valueColor={alberColor}
+          />
         </div>
 
-        {/* ── Quick actions ──────────────────────────────────────────────── */}
-        <div style={{ display: 'flex', gap: 12 }}>
-          <ActionBtn label="Deposit" icon="+" color="#6EC200" onClick={() => openTx('deposit')} />
-          <ActionBtn label="Withdraw" icon="−" color="#E85C2A" onClick={() => openTx('withdrawal')} />
+        {/* ── Row 2: action cards (same grid, same visual weight) ────────── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <BigCard
+            label="Deposit"
+            value="+"
+            sub="Add funds to the bank"
+            valueColor="#6EC200"
+            onClick={() => openTx('deposit')}
+          />
+          <BigCard
+            label="Withdraw"
+            value="−"
+            sub="Remove funds from the bank"
+            light
+            valueColor="#B03020"
+            onClick={() => openTx('withdrawal')}
+          />
         </div>
 
-        {/* ── History ───────────────────────────────────────────────────── */}
+        {/* ── Settlement + history ───────────────────────────────────────── */}
         {loaded && (
           <>
+            <BalancesWidget bets={bets} transactions={transactions} />
             <BankWidget
               transactions={transactions}
               total={adjustedBankTotal}
@@ -130,7 +136,6 @@ export default function BankPage() {
               onDeleteGroup={deleteGroup}
               hideHeader
             />
-            <BalancesWidget bets={bets} transactions={transactions} />
           </>
         )}
       </main>
