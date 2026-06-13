@@ -31,6 +31,7 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
   const [slipFile, setSlipFile]     = useState<File | null>(null)
   const [slipPreview, setSlipPreview] = useState<string | null>(editBet?.slipUrl ?? null)
   const [uploading, setUploading]   = useState(false)
+  const [dragOver, setDragOver]     = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({
     date:     editBet?.date    ?? new Date().toISOString().slice(0, 10),
@@ -311,15 +312,25 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
+                  onDragOver={e => { e.preventDefault(); setDragOver(true) }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={e => {
+                    e.preventDefault()
+                    setDragOver(false)
+                    const f = e.dataTransfer.files?.[0]
+                    if (f && f.type.startsWith('image/')) handleSlipChange(f)
+                  }}
                   style={{
-                    width: '100%', padding: '14px 0', borderRadius: 8,
-                    background: 'rgba(240,235,224,0.03)',
-                    border: '1px dashed rgba(240,235,224,0.14)',
-                    color: 'var(--color-muted)', cursor: 'pointer', fontSize: 13,
+                    width: '100%', padding: '18px 0', borderRadius: 8,
+                    background: dragOver ? 'rgba(240,235,224,0.08)' : 'rgba(240,235,224,0.03)',
+                    border: `1px dashed ${dragOver ? 'rgba(240,235,224,0.4)' : 'rgba(240,235,224,0.14)'}`,
+                    color: dragOver ? 'var(--color-text)' : 'var(--color-muted)',
+                    cursor: 'pointer', fontSize: 13,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    transition: 'background 0.15s, border-color 0.15s, color 0.15s',
                   }}
                 >
-                  📎 Attach slip image
+                  {dragOver ? '⬇ Drop to attach' : '📎 Attach slip image'}
                 </button>
               )}
             </div>
