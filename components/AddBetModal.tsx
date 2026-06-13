@@ -1,7 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Bet, BetResult, BetPicker, BetFunder } from '@/types/bet'
 import { fmtPnL } from '@/utils/currency'
+import { supabase } from '@/lib/supabase'
 
 interface AddBetModalProps {
   onClose: () => void
@@ -16,8 +17,20 @@ function calcProfit(odds: number, stake: number, result: BetResult): number {
   return 0
 }
 
+async function uploadSlip(file: File): Promise<string | null> {
+  const ext = file.name.split('.').pop() ?? 'jpg'
+  const path = `${Date.now()}.${ext}`
+  const { data, error } = await supabase.storage.from('bet-slips').upload(path, file, { contentType: file.type })
+  if (error || !data) return null
+  return supabase.storage.from('bet-slips').getPublicUrl(data.path).data.publicUrl
+}
+
 export default function AddBetModal({ onClose, onAdd, editBet, onUpdate }: AddBetModalProps) {
   const isEdit = !!editBet
+  const [slipFile, setSlipFile]     = useState<File | null>(null)
+  const [slipPreview, setSlipPreview] = useState<string | null>(editBet?.slipUrl ?? null)
+  const [uploading, setUploading]   = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({
     date:     editBet?.date    ?? new Date().toISOString().slice(0, 10),
     match:    editBet?.match   ?? '',
@@ -40,9 +53,20 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate }: AddBe
   const potentialWin = valid ? parseFloat(((stakeNum * oddsNum) - stakeNum).toFixed(2)) : null
   const preview      = valid ? calcProfit(oddsNum, stakeNum, form.result) : null
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSlipChange = (file: File) => {
+    setSlipFile(file)
+    setSlipPreview(URL.createObjectURL(file))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!valid) return
+    setUploading(true)
+    let slipUrl = editBet?.slipUrl ?? undefined
+    if (slipFile) {
+      const uploaded = await uploadSlip(slipFile)
+      if (uploaded) slipUrl = uploaded
+    }
     const profit = calcProfit(oddsNum, stakeNum, form.result)
     const description = form.match.trim() || `Bet @ ${form.odds}`
     const payload = {
@@ -52,12 +76,14 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate }: AddBe
       stake: stakeNum,
       profit,
       fundedBy: form.fundedBy as BetFunder,
+      slipUrl,
     }
     if (isEdit && editBet && onUpdate) {
       onUpdate(editBet.id, payload)
     } else {
       onAdd(payload)
     }
+    setUploading(false)
     onClose()
   }
 
@@ -250,6 +276,53 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate }: AddBe
               </div>
             </div>
 
+            {/* Betting slip image */}
+            <div>
+              <label style={lbl}>Betting slip (optional)</label>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={e => { const f = e.target.files?.[0]; if (f) handleSlipChange(f) }}
+              />
+              {slipPreview ? (
+                <div style={{ position: 'relative', display: 'inline-block' }}>
+                  <img
+                    src={slipPreview}
+                    alt="Betting slip"
+                    style={{ width: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 8, display: 'block', cursor: 'pointer' }}
+                    onClick={() => fileRef.current?.click()}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => { setSlipFile(null); setSlipPreview(null) }}
+                    style={{
+                      position: 'absolute', top: 6, right: 6,
+                      width: 24, height: 24, borderRadius: '50%',
+                      background: 'rgba(0,0,0,0.7)', border: 'none',
+                      color: '#fff', fontSize: 14, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >×</button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  style={{
+                    width: '100%', padding: '14px 0', borderRadius: 8,
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px dashed rgba(255,255,255,0.15)',
+                    color: 'var(--color-muted)', cursor: 'pointer', fontSize: 13,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  }}
+                >
+                  📎 Attach slip image
+                </button>
+              )}
+            </div>
+
           </div>
 
           {/* Actions */}
@@ -262,8 +335,8 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate }: AddBe
             }}>
               Cancel
             </button>
-            <button type="submit" className="btn-primary" style={{ flex: 2, padding: '11px 0', fontSize: 14 }}>
-              {isEdit ? 'Update' : 'Save bet'}
+            <button type="submit" disabled={uploading} className="btn-primary" style={{ flex: 2, padding: '11px 0', fontSize: 14, opacity: uploading ? 0.7 : 1 }}>
+              {uploading ? 'Saving…' : (isEdit ? 'Update' : 'Save bet')}
             </button>
           </div>
         </form>

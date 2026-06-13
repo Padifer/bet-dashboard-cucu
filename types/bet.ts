@@ -33,6 +33,7 @@ export interface Bet {
   myProb?: number      // estimated win probability (0–1) — used to compute EV
   closingOdds?: number // odds at market close, for "beat the close" tracking
   cashOut?: number     // gross amount received on early cash-out
+  slipUrl?: string     // URL of attached betting slip image
 }
 
 export interface BetStats {

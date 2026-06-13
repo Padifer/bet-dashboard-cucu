@@ -25,6 +25,7 @@ function rowToBet(r: any): Bet {
     myProb: r.my_prob ?? undefined,
     closingOdds: r.closing_odds ?? undefined,
     cashOut: r.cash_out ?? undefined,
+    slipUrl: r.slip_url ?? undefined,
     legs: r.legs ?? undefined,
   }
 }
@@ -47,6 +48,7 @@ function betToRow(b: Omit<Bet, 'id'> | Partial<Bet>): Record<string, unknown> {
   if ('myProb'      in b) r.my_prob       = b.myProb      ?? null
   if ('closingOdds' in b) r.closing_odds  = b.closingOdds ?? null
   if ('cashOut'     in b) r.cash_out      = b.cashOut     ?? null
+  if ('slipUrl'     in b) r.slip_url      = b.slipUrl     ?? null
   if ('legs'        in b) r.legs          = b.legs        ?? null
   return r
 }

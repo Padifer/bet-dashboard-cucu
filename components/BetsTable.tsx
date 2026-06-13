@@ -177,7 +177,12 @@ export default function BetsTable({ bets, onDelete, onEdit, onUpdateBet }: BetsT
                             </button>
                           )}
                           <div style={{ minWidth: 0 }}>
-                            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{bet.match}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{bet.match}</span>
+                              {bet.slipUrl && (
+                                <a href={bet.slipUrl} target="_blank" rel="noreferrer" title="View slip" style={{ flexShrink: 0, fontSize: 12, opacity: 0.6, textDecoration: 'none', lineHeight: 1 }}>📎</a>
+                              )}
+                            </div>
                             {bet.bookmaker && <div style={{ fontSize: 10, color: 'var(--color-muted)', marginTop: 1 }}>{bet.bookmaker}</div>}
                           </div>
                         </div>
