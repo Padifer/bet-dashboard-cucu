@@ -26,8 +26,8 @@ interface UpcomingMatch {
   id: number
   competition: string
   competitionShort: string
-  homeTeam: string
-  awayTeam: string
+  homeTeam: string | null
+  awayTeam: string | null
   utcDate: string
   status: string
   scoreHome: number | null
@@ -47,7 +47,8 @@ interface EnrichedMatch extends UpcomingMatch {
   odds: MatchOdds | null
 }
 
-function normalize(name: string) {
+function normalize(name: string | null): string {
+  if (!name) return ''
   return name.toLowerCase().replace(/[^a-z0-9]/g, '')
 }
 
@@ -63,25 +64,26 @@ const ALIASES: Record<string, string> = {
   ivorycoast: 'ivorycoast', cotedivoire: 'ivorycoast',
   // Czechia
   czechia: 'czechia', czechrepublic: 'czechia',
-  // Trinidad & Tobago
-  trinidadandtobago: 'trinidadtobago', trinidadtobago: 'trinidadtobago',
-  // Bosnia
-  bosniaandherzegovina: 'bosnia', bosniaherzegovina: 'bosnia', bosnia: 'bosnia',
+  // Cape Verde — football-data uses "Cape Verde Islands", Odds API uses "Cape Verde"
+  capeverdeislands: 'capeverde', capeverde: 'capeverde',
+  // Bosnia — both APIs normalize to same string after stripping &/-
+  bosniaherzegovina: 'bosnia', bosniaandherzegovina: 'bosnia',
   // North Macedonia
-  northmacedonia: 'northmacedonia', macedonia: 'northmacedonia', republicofnorthmacedonia: 'northmacedonia',
-  // Republic of Ireland
-  republicofireland: 'ireland', ireland: 'ireland',
-  // Congo DR / DRC
-  democraticrepublicofthecongo: 'drcongo', drcongo: 'drcongo', congodr: 'drcongo',
+  northmacedonia: 'northmacedonia', macedonia: 'northmacedonia',
+  // Congo DR — football-data: "Congo DR", Odds API: "DR Congo"
+  congodr: 'drcongo', drcongo: 'drcongo', democraticrepublicofthecongo: 'drcongo',
 }
 
-function canonical(name: string): string {
+function canonical(name: string | null): string {
   const n = normalize(name)
+  if (!n) return ''
   return ALIASES[n] ?? n
 }
 
 function mergeOdds(matches: UpcomingMatch[], odds: MatchOdds[]): EnrichedMatch[] {
   return matches.map(m => {
+    // TBD knockout matches have null teams — skip odds matching, show as placeholder
+    if (!m.homeTeam || !m.awayTeam) return { ...m, odds: null }
     const ch = canonical(m.homeTeam)
     const ca = canonical(m.awayTeam)
     // 1st pass: exact canonical match (handles USA vs "United States" etc)
@@ -184,7 +186,7 @@ function MatchCard({ match, onBet }: { match: EnrichedMatch; onBet: (m: Enriched
 
       {/* Teams + score */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <span style={{ fontSize: 14, fontWeight: 700, flex: 1, textAlign: 'left' }}>{match.homeTeam}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, flex: 1, textAlign: 'left' }}>{match.homeTeam ?? 'TBD'}</span>
         {finished || live ? (
           <span className="num" style={{
             fontSize: 20, fontWeight: 900, padding: '4px 16px',
@@ -197,17 +199,17 @@ function MatchCard({ match, onBet }: { match: EnrichedMatch; onBet: (m: Enriched
         ) : (
           <span style={{ fontSize: 13, color: 'var(--color-muted)', padding: '4px 14px' }}>vs</span>
         )}
-        <span style={{ fontSize: 14, fontWeight: 700, flex: 1, textAlign: 'right' }}>{match.awayTeam}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, flex: 1, textAlign: 'right' }}>{match.awayTeam ?? 'TBD'}</span>
       </div>
 
       {/* Odds row */}
       {match.odds && !finished ? (
         <div style={{ display: 'flex', gap: 6 }}>
-          <OddsButton value={match.odds.homeOdds} label={match.homeTeam.split(' ').pop() ?? '1'} onClick={() => onBet(match, match.homeTeam, match.odds!.homeOdds)} />
+          <OddsButton value={match.odds.homeOdds} label={(match.homeTeam ?? '1').split(' ').pop() ?? '1'} onClick={() => onBet(match, match.homeTeam ?? 'Home', match.odds!.homeOdds)} />
           {match.odds.drawOdds > 0 && (
             <OddsButton value={match.odds.drawOdds} label="Draw" onClick={() => onBet(match, 'Draw', match.odds!.drawOdds)} />
           )}
-          <OddsButton value={match.odds.awayOdds} label={match.awayTeam.split(' ').pop() ?? '2'} onClick={() => onBet(match, match.awayTeam, match.odds!.awayOdds)} />
+          <OddsButton value={match.odds.awayOdds} label={(match.awayTeam ?? '2').split(' ').pop() ?? '2'} onClick={() => onBet(match, match.awayTeam ?? 'Away', match.odds!.awayOdds)} />
         </div>
       ) : !finished ? (
         <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--color-muted)', padding: '8px 0' }}>
@@ -223,15 +225,16 @@ export default function FixturesPage() {
   const [matches, setMatches] = useState<EnrichedMatch[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [tab, setTab] = useState<'today' | 'upcoming'>('today')
+  const [tab, setTab] = useState<'today' | 'upcoming' | 'results'>('today')
   const [showModal, setShowModal] = useState(false)
   const [prefilledBet, setPrefilledBet] = useState<{ match: string; odds: string } | null>(null)
 
-  // Auto-switch to Upcoming when Today is empty (Bangkok UTC+7 means late-UTC matches show as tomorrow)
+  // Auto-switch: prefer Upcoming when Today empty, else Results if there are finished matches
   useEffect(() => {
-    if (matches.length > 0 && !matches.some(m => isToday(m.utcDate))) {
-      setTab('upcoming')
-    }
+    if (matches.length === 0) return
+    const hasToday    = matches.some(m => isToday(m.utcDate) && m.status !== 'FINISHED')
+    const hasUpcoming = matches.some(m => !isToday(m.utcDate) && m.status !== 'FINISHED')
+    if (!hasToday) setTab(hasUpcoming ? 'upcoming' : 'results')
   }, [matches])
 
   useEffect(() => {
@@ -254,10 +257,11 @@ export default function FixturesPage() {
     load()
   }, [])
 
-  const todayMatches    = matches.filter(m => isToday(m.utcDate))
-  const upcomingMatches = matches.filter(m => !isToday(m.utcDate))
+  const resultMatches   = matches.filter(m => m.status === 'FINISHED')
+  const todayMatches    = matches.filter(m => isToday(m.utcDate) && m.status !== 'FINISHED')
+  const upcomingMatches = matches.filter(m => !isToday(m.utcDate) && m.status !== 'FINISHED')
 
-  const displayed = tab === 'today' ? todayMatches : upcomingMatches
+  const displayed = tab === 'results' ? resultMatches : tab === 'today' ? todayMatches : upcomingMatches
 
   const grouped: Record<string, EnrichedMatch[]> = {}
   for (const m of displayed) {
@@ -268,7 +272,7 @@ export default function FixturesPage() {
 
   const handleBet = (match: EnrichedMatch, pick: string, odds: number) => {
     setPrefilledBet({
-      match: `${match.homeTeam} vs ${match.awayTeam} — ${pick}`,
+      match: `${match.homeTeam ?? 'TBD'} vs ${match.awayTeam ?? 'TBD'} — ${pick}`,
       odds: odds.toFixed(2),
     })
     setShowModal(true)
@@ -287,7 +291,11 @@ export default function FixturesPage() {
         borderBottom: '1px solid rgba(240,235,224,0.07)',
       }}>
         <div style={{ maxWidth: 700, margin: '0 auto', padding: '10px 16px', display: 'flex', gap: 8 }}>
-          {([['today', `Today`, todayMatches.length], ['upcoming', `Upcoming`, upcomingMatches.length]] as const).map(([key, label, count]) => {
+          {([
+            ['results',  'Results',  resultMatches.length],
+            ['today',    'Today',    todayMatches.length],
+            ['upcoming', 'Upcoming', upcomingMatches.length],
+          ] as const).map(([key, label, count]) => {
             const active = tab === key
             return (
               <button key={key} onClick={() => setTab(key)} className="pill-btn" style={{
@@ -308,9 +316,9 @@ export default function FixturesPage() {
         {/* Stats strip — shown once data loaded */}
         {!loading && !error && matches.length > 0 && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-            <MiniCard label="Total Matches" value={matches.length} sub="WC 2026" />
-            <MiniCard label="Today" value={todayMatches.length} light valueColor={todayMatches.length > 0 ? '#1B6B1B' : undefined} />
-            <MiniCard label="With Odds" value={matches.filter(m => m.odds).length} sub={`${matches.filter(m => !m.odds).length} TBD`} />
+            <MiniCard label="Played" value={resultMatches.length} sub="WC 2026" light />
+            <MiniCard label="Upcoming" value={upcomingMatches.length} />
+            <MiniCard label="With Odds" value={matches.filter(m => m.odds).length} light valueColor="#1B6B1B" />
           </div>
         )}
 
