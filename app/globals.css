@@ -1,18 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --bg-base:        #0F1117;
-  --bg-card:        #161B27;
-  --bg-card-hover:  #1C2235;
+  --bg-base:        #1A2534;
+  --bg-card:        #213045;
+  --bg-card-hover:  #263A55;
+  --bg-elevated:    #1E2D42;
   --border-card:    rgba(255, 255, 255, 0.07);
-  --border-focus:   rgba(245, 166, 35, 0.5);
-  --color-win:      #4ADE80;
-  --color-loss:     #F87171;
-  --color-pending:  #FBBF24;
-  --color-void:     #64748B;
+  --border-strong:  rgba(255, 255, 255, 0.12);
+  --color-win:      #3DD68C;
+  --color-loss:     #E05353;
+  --color-pending:  #F5C842;
+  --color-void:     #6B8BA4;
   --color-accent:   #F5A623;
-  --color-text:     #E2E8F0;
-  --color-muted:    #64748B;
+  --color-text:     #FFFFFF;
+  --color-text-2:   #C8D8E8;
+  --color-muted:    #6B8BA4;
 }
 
 @theme inline {
@@ -34,12 +36,13 @@ body {
 .glass-card {
   background: var(--bg-card);
   border: 1px solid var(--border-card);
-  border-radius: 12px;
-  transition: border-color 0.2s;
+  border-radius: 10px;
+  transition: border-color 0.2s, background 0.2s;
 }
 
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--bg-card-hover);
+  border-color: var(--border-strong);
 }
 
 /* ── Badges ──────────────────────────────────────────────────────────────── */
@@ -47,54 +50,56 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
-  border-radius: 6px;
+  padding: 3px 10px;
+  border-radius: 5px;
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.badge-win     { background: rgba(74,222,128,0.12);  color: var(--color-win);     border: 1px solid rgba(74,222,128,0.2);  }
-.badge-loss    { background: rgba(248,113,113,0.12); color: var(--color-loss);    border: 1px solid rgba(248,113,113,0.2); }
-.badge-pending { background: rgba(251,191,36,0.12);  color: var(--color-pending); border: 1px solid rgba(251,191,36,0.2);  }
-.badge-void    { background: rgba(100,116,139,0.12); color: var(--color-void);    border: 1px solid rgba(100,116,139,0.2); }
+.badge-win     { background: rgba(61,214,140,0.15);  color: var(--color-win);     }
+.badge-loss    { background: rgba(224,83,83,0.15);   color: var(--color-loss);    }
+.badge-pending { background: rgba(245,200,66,0.15);  color: var(--color-pending); }
+.badge-void    { background: rgba(107,139,164,0.15); color: var(--color-void);    }
 
 /* ── Buttons ─────────────────────────────────────────────────────────────── */
 .btn-primary {
   background: var(--color-accent);
-  color: #0F1117;
+  color: #1A2534;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 700;
-  transition: opacity 0.15s;
+  letter-spacing: 0.01em;
+  transition: background 0.15s;
 }
-.btn-primary:hover  { opacity: 0.88; }
-.btn-primary:active { opacity: 0.75; }
+.btn-primary:hover  { background: #e8940f; }
+.btn-primary:active { background: #d4840a; }
 
 /* ── Inputs ──────────────────────────────────────────────────────────────── */
 .input-dark {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  background: #152030;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
   color: var(--color-text);
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
   outline: none;
   width: 100%;
   padding: 10px 12px;
   font-size: 14px;
 }
 .input-dark:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(245,166,35,0.15);
 }
-.input-dark option { background: var(--bg-card); }
+.input-dark option { background: #152030; }
 
 /* ── Modal ───────────────────────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.75);
   z-index: 50;
   display: flex;
   align-items: center;
@@ -114,10 +119,10 @@ body {
 }
 
 /* ── Table row result accents ────────────────────────────────────────────── */
-.row-win     td:first-child { border-left: 3px solid rgba(74,222,128,0.5);  }
-.row-loss    td:first-child { border-left: 3px solid rgba(248,113,113,0.5); }
-.row-pending td:first-child { border-left: 3px solid rgba(251,191,36,0.4);  }
-.row-void    td:first-child { border-left: 3px solid rgba(100,116,139,0.3); }
+.row-win     td:first-child { border-left: 3px solid rgba(61,214,140,0.7);  }
+.row-loss    td:first-child { border-left: 3px solid rgba(224,83,83,0.7);   }
+.row-pending td:first-child { border-left: 3px solid rgba(245,200,66,0.6);  }
+.row-void    td:first-child { border-left: 3px solid rgba(107,139,164,0.4); }
 
 /* ── Typography utilities ────────────────────────────────────────────────── */
 .num {
@@ -128,7 +133,7 @@ body {
 /* ── Scrollbar ───────────────────────────────────────────────────────────── */
 .scrollbar-thin::-webkit-scrollbar { width: 4px; }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-.scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
 /* ── Mobile responsive ───────────────────────────────────────────────────── */
 @media (max-width: 768px) {
@@ -150,7 +155,7 @@ body {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.fade-up { animation: fadeUp 0.25s ease forwards; }
+.fade-up { animation: fadeUp 0.22s ease forwards; }
 
 /* ── Bottom navigation (mobile only) ──────────────────────────────────────── */
 .bottom-nav { display: none; }
@@ -170,14 +175,12 @@ body {
     padding-bottom: 10px !important;
   }
 
-  .charts-section-mobile { display: block; }
-
   .modal-overlay {
     align-items: flex-end !important;
     padding: 0 !important;
   }
   .modal-sheet {
-    border-radius: 16px 16px 0 0 !important;
+    border-radius: 14px 14px 0 0 !important;
     max-height: 92dvh !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -187,5 +190,5 @@ body {
 }
 
 @media (min-width: 769px) {
-  .modal-sheet { border-radius: 12px; }
+  .modal-sheet { border-radius: 10px; }
 }

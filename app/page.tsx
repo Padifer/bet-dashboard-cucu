@@ -88,8 +88,8 @@ export default function Dashboard() {
         position: 'sticky',
         top: 'calc(56px + env(safe-area-inset-top))',
         zIndex: 39,
-        background: '#0F1117',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        background: '#152030',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
       }}>
         <div style={{
           maxWidth: 1200, margin: '0 auto',

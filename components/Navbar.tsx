@@ -28,8 +28,8 @@ export default function Navbar({ onAddBet }: NavbarProps) {
   return (
     <nav style={{
       position: 'sticky', top: 0, zIndex: 40,
-      background: '#0F1117',
-      borderBottom: '1px solid rgba(255,255,255,0.07)',
+      background: '#152030',
+      borderBottom: '1px solid rgba(255,255,255,0.08)',
       paddingTop: 'env(safe-area-inset-top)',
     }}>
       <div style={{
