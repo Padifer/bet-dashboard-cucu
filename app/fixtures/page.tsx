@@ -5,6 +5,23 @@ import BottomNav from '@/components/BottomNav'
 import AddBetModal from '@/components/AddBetModal'
 import { useBets } from '@/hooks/useBets'
 
+function MiniCard({ label, value, sub, light = false, valueColor }: {
+  label: string; value: string | number; sub?: string; light?: boolean; valueColor?: string
+}) {
+  const bg = light ? '#F0EBE0' : '#223022'
+  const border = light ? 'rgba(27,43,27,0.1)' : 'rgba(240,235,224,0.07)'
+  const labelCol = light ? 'rgba(27,43,27,0.4)' : 'rgba(240,235,224,0.4)'
+  const defaultVal = light ? '#1B2B1B' : '#F0EBE0'
+  const subCol = light ? 'rgba(27,43,27,0.35)' : 'rgba(240,235,224,0.33)'
+  return (
+    <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: '16px 18px' }}>
+      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: labelCol, marginBottom: 8 }}>{label}</div>
+      <div className="num" style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1, color: valueColor ?? defaultVal }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, marginTop: 6, color: subCol }}>{sub}</div>}
+    </div>
+  )
+}
+
 interface UpcomingMatch {
   id: number
   competition: string
@@ -258,25 +275,38 @@ export default function FixturesPage() {
         position: 'sticky',
         top: 'calc(56px + env(safe-area-inset-top))',
         zIndex: 39,
-        background: '#223022',
-        borderBottom: '1px solid rgba(240,235,224,0.08)',
+        background: 'rgba(27,43,27,0.97)',
+        backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(240,235,224,0.07)',
       }}>
         <div style={{ maxWidth: 700, margin: '0 auto', padding: '10px 16px', display: 'flex', gap: 8 }}>
-          {([['today', `Today${todayMatches.length ? ` (${todayMatches.length})` : ''}`], ['upcoming', `Upcoming${upcomingMatches.length ? ` (${upcomingMatches.length})` : ''}`]] as const).map(([key, label]) => {
+          {([['today', `Today`, todayMatches.length], ['upcoming', `Upcoming`, upcomingMatches.length]] as const).map(([key, label, count]) => {
             const active = tab === key
             return (
-              <button key={key} onClick={() => setTab(key)} style={{
-                padding: '7px 18px', borderRadius: 20, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                background: active ? 'rgba(240,235,224,0.1)' : 'rgba(240,235,224,0.04)',
-                border: active ? '1px solid rgba(111,106,55,0.3)' : '1px solid rgba(240,235,224,0.08)',
+              <button key={key} onClick={() => setTab(key)} className="pill-btn" style={{
+                padding: '6px 16px', borderRadius: 20, fontSize: 13, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
+                background: active ? 'rgba(129,140,248,0.18)' : 'rgba(240,235,224,0.04)',
+                border: active ? '1px solid rgba(129,140,248,0.4)' : '1px solid rgba(240,235,224,0.08)',
                 color: active ? 'var(--color-accent)' : 'var(--color-muted)',
-              }}>{label}</button>
+              }}>
+                {label} <span style={{ opacity: 0.7, fontSize: 11 }}>{count}</span>
+              </button>
             )
           })}
         </div>
       </div>
 
       <main style={{ maxWidth: 700, margin: '0 auto', padding: '16px 16px 100px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+        {/* Stats strip — shown once data loaded */}
+        {!loading && !error && matches.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            <MiniCard label="Total Matches" value={matches.length} sub="WC 2026" />
+            <MiniCard label="Today" value={todayMatches.length} light valueColor={todayMatches.length > 0 ? '#1B6B1B' : undefined} />
+            <MiniCard label="With Odds" value={matches.filter(m => m.odds).length} sub={`${matches.filter(m => !m.odds).length} TBD`} />
+          </div>
+        )}
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-muted)' }}>Loading fixtures…</div>
         ) : error ? (

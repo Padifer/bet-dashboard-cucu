@@ -7,6 +7,23 @@ import Navbar from '@/components/Navbar'
 import AddBetModal from '@/components/AddBetModal'
 import BottomNav from '@/components/BottomNav'
 
+function MiniCard({ label, value, sub, light = false, valueColor }: {
+  label: string; value: string | number; sub?: string; light?: boolean; valueColor?: string
+}) {
+  const bg = light ? '#F0EBE0' : '#223022'
+  const border = light ? 'rgba(27,43,27,0.1)' : 'rgba(240,235,224,0.07)'
+  const labelCol = light ? 'rgba(27,43,27,0.4)' : 'rgba(240,235,224,0.4)'
+  const defaultVal = light ? '#1B2B1B' : '#F0EBE0'
+  const subCol = light ? 'rgba(27,43,27,0.35)' : 'rgba(240,235,224,0.33)'
+  return (
+    <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: '16px 18px' }}>
+      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: labelCol, marginBottom: 8 }}>{label}</div>
+      <div className="num" style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1, color: valueColor ?? defaultVal }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, marginTop: 6, color: subCol }}>{sub}</div>}
+    </div>
+  )
+}
+
 const RESULT_COLOR = {
   win:     'var(--color-win)',
   loss:    'var(--color-loss)',
@@ -160,9 +177,23 @@ export default function BetsPage() {
     { key: 'loss',    label: '❌',      count: stats.losses },
   ]
 
+  const roiStr = `${stats.roi >= 0 ? '+' : ''}${stats.roi.toFixed(1)}%`
+  const pendingStake = bets.filter(b => b.result === 'pending').reduce((s, b) => s + b.stake, 0)
+
   return (
     <>
       <Navbar onAddBet={() => setShowModal(true)} />
+
+      {/* Stats hero */}
+      <div style={{ maxWidth: 700, margin: '0 auto', padding: '16px 16px 0' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+          <MiniCard label="Open" value={stats.pending} sub={`$${pendingStake.toFixed(0)} at risk`} light />
+          <MiniCard label="Won" value={stats.wins} valueColor="#6EC200" />
+          <MiniCard label="Lost" value={stats.losses} valueColor="#E85C2A" light />
+          <MiniCard label="ROI" value={roiStr} sub={`${stats.total} bets`}
+            valueColor={stats.roi >= 0 ? '#6EC200' : '#E85C2A'} />
+        </div>
+      </div>
 
       {/* Sticky filter bar */}
       <div style={{
