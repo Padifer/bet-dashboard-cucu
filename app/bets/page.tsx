@@ -122,20 +122,6 @@ function BetCard({ bet, onEdit, onDelete }: { bet: Bet; onEdit: (b: Bet) => void
 type FilterResult = 'all' | 'win' | 'loss' | 'pending'
 type SortBy = 'date' | 'profit' | 'odds'
 
-async function sendTelegramReminder(pendingBets: Bet[]) {
-  if (!pendingBets.length) return
-  const lines = pendingBets.map(b =>
-    `⏳ <b>${b.match}</b>\n  Pick: ${b.prediction} @ <b>${b.odds}</b>  Stake: $${b.stake}`
-  ).join('\n\n')
-  const message = `⚽ <b>Mundial de los Chunguitos</b>\n${pendingBets.length} open bet${pendingBets.length > 1 ? 's' : ''} pending result:\n\n${lines}`
-  const res = await fetch('/api/notify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message }),
-  })
-  return res.ok
-}
-
 export default function BetsPage() {
   const { bets, addBet, deleteBet, updateBet, loaded, stats } = useBets()
   const [showModal, setShowModal]   = useState(false)
@@ -143,8 +129,6 @@ export default function BetsPage() {
   const [filter, setFilter]         = useState<FilterResult>('all')
   const [sortBy, setSortBy]         = useState<SortBy>('date')
   const [dateRange, setDateRange]   = useState<'all' | '30d' | '90d'>('all')
-  const [tgSending, setTgSending]   = useState(false)
-  const [tgStatus, setTgStatus]     = useState<'idle' | 'ok' | 'err'>('idle')
 
   if (!loaded) return (
     <>
@@ -236,35 +220,6 @@ export default function BetsPage() {
         padding: '16px 16px 100px',
         display: 'flex', flexDirection: 'column', gap: 12,
       }}>
-        {/* Telegram reminder — show only when there are pending bets */}
-        {stats.pending > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderRadius: 10, background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.08)' }}>
-            <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>
-              {stats.pending} open bet{stats.pending > 1 ? 's' : ''} pending result
-            </span>
-            <button
-              onClick={async () => {
-                setTgSending(true); setTgStatus('idle')
-                const pendingBets = bets.filter(b => b.result === 'pending')
-                const ok = await sendTelegramReminder(pendingBets)
-                setTgStatus(ok ? 'ok' : 'err')
-                setTgSending(false)
-                setTimeout(() => setTgStatus('idle'), 3000)
-              }}
-              disabled={tgSending}
-              style={{
-                padding: '5px 12px', borderRadius: 8, cursor: tgSending ? 'wait' : 'pointer', border: 'none',
-                background: tgStatus === 'ok' ? 'rgba(110,194,0,0.2)' : tgStatus === 'err' ? 'rgba(232,92,42,0.2)' : 'rgba(240,235,224,0.08)',
-                color: tgStatus === 'ok' ? '#6EC200' : tgStatus === 'err' ? '#E85C2A' : 'var(--color-muted)',
-                fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5,
-                transition: 'background 0.15s, color 0.15s',
-              }}
-            >
-              {tgSending ? '…' : tgStatus === 'ok' ? '✓ Sent' : tgStatus === 'err' ? '✗ Error' : '📬 Remind via Telegram'}
-            </button>
-          </div>
-        )}
-
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-muted)' }}>
             No bets {filter !== 'all' ? 'in this category' : 'yet — add your first one!'}
