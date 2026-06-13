@@ -57,7 +57,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
           {stats.currentStreakType === 'win' ? '🔥' : '🥶'} {streakLabel}
         </div>
       )}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 14 }}>
+      <div className="grid-stats-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 14 }}>
         <StatCard
           label="Total Staked" value={fmt(stats.totalStake)}
           sub={`Each: ${fmt(stats.totalStake / 2)}`}

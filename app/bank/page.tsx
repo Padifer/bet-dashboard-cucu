@@ -62,15 +62,15 @@ export default function BankPage() {
   const adjustedAlbertoTotal = albertoTotal + bankFundedImpact / 2
 
   const bankColor  = adjustedBankTotal >= 0 ? '#1B6B1B' : '#B03020'
-  const pabloColor = adjustedPabloTotal >= 0 ? '#6EC200' : '#E85C2A'
-  const alberColor = adjustedAlbertoTotal >= 0 ? '#1B6B1B' : '#B03020'
 
-  // Sub-text helpers: raw deposits vs withdrawals per person (debts excluded)
+  // Shared-fund view: treat all deposits as pooled, each person owns 50%
   const cashTxs = transactions.filter(t => t.type !== 'debt')
-  const pIn  = cashTxs.filter(t => t.person === 'Pablo'   && t.type === 'deposit').reduce((s, t) => s + t.amount, 0)
-  const pOut = cashTxs.filter(t => t.person === 'Pablo'   && t.type === 'withdrawal').reduce((s, t) => s + t.amount, 0)
-  const aIn  = cashTxs.filter(t => t.person === 'Alberto' && t.type === 'deposit').reduce((s, t) => s + t.amount, 0)
-  const aOut = cashTxs.filter(t => t.person === 'Alberto' && t.type === 'withdrawal').reduce((s, t) => s + t.amount, 0)
+  const totalDeposited  = cashTxs.filter(t => t.type === 'deposit').reduce((s, t) => s + t.amount, 0)
+  const totalWithdrawn  = cashTxs.filter(t => t.type === 'withdrawal').reduce((s, t) => s + t.amount, 0)
+  const eachContributed = (totalDeposited - totalWithdrawn) / 2   // fair share of net deposits
+  const eachShareNow    = adjustedBankTotal / 2                    // current value if split today
+  const eachProfit      = parseFloat((eachShareNow - eachContributed).toFixed(2))
+  const shareColor      = eachShareNow >= eachContributed ? '#6EC200' : '#E85C2A'
 
   function openTx(type: 'deposit' | 'withdrawal') {
     setTxType(type); setShowTxModal(true)
@@ -97,16 +97,16 @@ export default function BankPage() {
           />
           <BigCard
             label="Pablo"
-            value={loaded ? fmt(adjustedPabloTotal) : '…'}
-            sub={loaded ? `${fmt(pIn)} in · ${fmt(pOut)} out` : undefined}
-            valueColor={pabloColor}
+            value={loaded ? fmt(eachShareNow) : '…'}
+            sub={loaded ? `${fmt(eachContributed)} in · ${eachProfit >= 0 ? '+' : ''}${fmt(eachProfit)} profit` : undefined}
+            valueColor={shareColor}
           />
           <BigCard
             label="Alberto"
-            value={loaded ? fmt(adjustedAlbertoTotal) : '…'}
-            sub={loaded ? `${fmt(aIn)} in · ${fmt(aOut)} out` : undefined}
+            value={loaded ? fmt(eachShareNow) : '…'}
+            sub={loaded ? `${fmt(eachContributed)} in · ${eachProfit >= 0 ? '+' : ''}${fmt(eachProfit)} profit` : undefined}
             light
-            valueColor={alberColor}
+            valueColor={eachShareNow >= eachContributed ? '#1B6B1B' : '#B03020'}
           />
         </div>
 

@@ -187,8 +187,9 @@ body {
   .grid-bankroll       { grid-template-columns: 1fr !important; }
 
   /* 4-col grids → 2×2 on mobile */
-  .grid-hero   { grid-template-columns: repeat(2, 1fr); }
-  .grid-mini-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-hero    { grid-template-columns: repeat(2, 1fr); }
+  .grid-mini-4  { grid-template-columns: repeat(2, 1fr); }
+  .grid-stats-4 { grid-template-columns: repeat(2, 1fr) !important; }
 
   /* Bank hero: Bank Balance full-width, Pablo + Alberto side by side */
   .grid-bank-hero { grid-template-columns: 1fr 1fr; }
