@@ -111,8 +111,8 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="fade-up modal-sheet scrollbar-thin" style={{
         width: '100%', maxWidth: 480,
-        background: '#1E2D42',
-        border: '1px solid rgba(255,255,255,0.08)',
+        background: '#F0EDD8',
+        border: '1px solid rgba(111,106,55,0.13)',
         borderRadius: 10,
         maxHeight: '90dvh', overflowY: 'auto',
         padding: 24,
@@ -124,7 +124,7 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
             {isEdit ? 'Edit Bet' : 'Add Bet'}
           </h2>
           <button onClick={onClose} style={{
-            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)',
+            background: 'rgba(111,106,55,0.09)', border: '1px solid rgba(111,106,55,0.13)',
             borderRadius: 6, color: 'var(--color-muted)', cursor: 'pointer',
             width: 30, height: 30, fontSize: 15, display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>×</button>
@@ -195,8 +195,8 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
                   return (
                     <button key={value} type="button" onClick={() => set('result', value)} style={{
                       padding: '9px 6px', borderRadius: 7, fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                      border: `1px solid ${active ? color + '60' : 'rgba(255,255,255,0.08)'}`,
-                      background: active ? color + '18' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${active ? color + '60' : 'rgba(111,106,55,0.13)'}`,
+                      background: active ? color + '18' : 'rgba(111,106,55,0.05)',
                       color: active ? color : 'var(--color-muted)',
                       transition: 'all 0.12s',
                     }}>
@@ -232,8 +232,8 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
                     return (
                       <button key={value} type="button" onClick={() => set('picker', value)} style={{
                         flex: 1, padding: '8px 4px', borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: 'pointer',
-                        border: `1px solid ${active ? 'rgba(245,166,35,0.5)' : 'rgba(255,255,255,0.07)'}`,
-                        background: active ? 'rgba(245,166,35,0.12)' : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${active ? 'rgba(245,166,35,0.5)' : 'rgba(111,106,55,0.12)'}`,
+                        background: active ? 'rgba(111,106,55,0.12)' : 'rgba(111,106,55,0.05)',
                         color: active ? 'var(--color-accent)' : 'var(--color-muted)',
                         transition: 'all 0.12s',
                       }}>
@@ -252,8 +252,8 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
                     return (
                       <button key={value} type="button" onClick={() => set('fundedBy', value)} style={{
                         flex: 1, padding: '8px 4px', borderRadius: 7, fontSize: 11, fontWeight: 700, cursor: 'pointer',
-                        border: `1px solid ${active ? 'rgba(245,166,35,0.5)' : 'rgba(255,255,255,0.07)'}`,
-                        background: active ? 'rgba(245,166,35,0.12)' : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${active ? 'rgba(245,166,35,0.5)' : 'rgba(111,106,55,0.12)'}`,
+                        background: active ? 'rgba(111,106,55,0.12)' : 'rgba(111,106,55,0.05)',
                         color: active ? 'var(--color-accent)' : 'var(--color-muted)',
                         transition: 'all 0.12s',
                       }}>
@@ -313,8 +313,8 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
                   onClick={() => fileRef.current?.click()}
                   style={{
                     width: '100%', padding: '14px 0', borderRadius: 8,
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px dashed rgba(255,255,255,0.15)',
+                    background: 'rgba(111,106,55,0.05)',
+                    border: '1px dashed rgba(111,106,55,0.22)',
                     color: 'var(--color-muted)', cursor: 'pointer', fontSize: 13,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   }}
@@ -330,8 +330,8 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
           <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
             <button type="button" onClick={onClose} style={{
               flex: 1, padding: '11px 0', borderRadius: 7,
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.09)',
+              background: 'rgba(111,106,55,0.07)',
+              border: '1px solid rgba(111,106,55,0.14)',
               color: 'var(--color-muted)', cursor: 'pointer', fontWeight: 600, fontSize: 14,
             }}>
               Cancel

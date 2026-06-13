@@ -118,7 +118,7 @@ export default function MigratePage() {
 
         {log.length > 0 && (
           <div style={{
-            marginTop: 20, background: 'rgba(0,0,0,0.3)', borderRadius: 10,
+            marginTop: 20, background: 'rgba(0,0,0,0.2)', borderRadius: 10,
             padding: '12px 16px', fontSize: 13, display: 'flex', flexDirection: 'column', gap: 4,
           }}>
             {log.map((l, i) => (

@@ -68,13 +68,13 @@ function OddsButton({ value, label, onClick }: { value: number; label: string; o
       onClick={onClick}
       style={{
         flex: 1, padding: '8px 4px', borderRadius: 8, cursor: 'pointer',
-        background: 'rgba(245,166,35,0.07)',
+        background: 'rgba(111,106,55,0.07)',
         border: '1px solid rgba(245,166,35,0.2)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
         transition: 'background 0.15s, border-color 0.15s',
       }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(245,166,35,0.15)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.45)' }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(245,166,35,0.07)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.2)' }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(111,106,55,0.15)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(111,106,55,0.35)' }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(111,106,55,0.07)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245,166,35,0.2)' }}
     >
       <span style={{ fontSize: 10, color: 'var(--color-muted)', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{label}</span>
       <span className="num" style={{ fontSize: 15, fontWeight: 800, color: 'var(--color-accent)' }}>{value.toFixed(2)}</span>
@@ -92,7 +92,7 @@ function MatchCard({ match, onBet }: { match: EnrichedMatch; onBet: (m: Enriched
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <span style={{
           fontSize: 10, fontWeight: 700, color: 'var(--color-accent)',
-          background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.2)',
+          background: 'rgba(111,106,55,0.1)', border: '1px solid rgba(245,166,35,0.2)',
           borderRadius: 5, padding: '2px 8px', letterSpacing: '0.04em', textTransform: 'uppercase',
         }}>{match.competitionShort}</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -120,7 +120,7 @@ function MatchCard({ match, onBet }: { match: EnrichedMatch; onBet: (m: Enriched
           <span className="num" style={{
             fontSize: 20, fontWeight: 900, padding: '4px 16px',
             color: 'var(--color-text)',
-            background: 'rgba(255,255,255,0.06)', borderRadius: 8,
+            background: 'rgba(111,106,55,0.09)', borderRadius: 8,
             letterSpacing: '-0.02em',
           }}>
             {match.scoreHome ?? '—'} – {match.scoreAway ?? '—'}
@@ -206,8 +206,8 @@ export default function FixturesPage() {
         position: 'sticky',
         top: 'calc(56px + env(safe-area-inset-top))',
         zIndex: 39,
-        background: '#152030',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        background: '#EAE7D5',
+        borderBottom: '1px solid rgba(111,106,55,0.13)',
       }}>
         <div style={{ maxWidth: 700, margin: '0 auto', padding: '10px 16px', display: 'flex', gap: 8 }}>
           {([['today', `Today${todayMatches.length ? ` (${todayMatches.length})` : ''}`], ['upcoming', `Upcoming${upcomingMatches.length ? ` (${upcomingMatches.length})` : ''}`]] as const).map(([key, label]) => {
@@ -215,8 +215,8 @@ export default function FixturesPage() {
             return (
               <button key={key} onClick={() => setTab(key)} style={{
                 padding: '7px 18px', borderRadius: 20, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                background: active ? 'rgba(245,166,35,0.15)' : 'rgba(255,255,255,0.04)',
-                border: active ? '1px solid rgba(245,166,35,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                background: active ? 'rgba(111,106,55,0.15)' : 'rgba(111,106,55,0.06)',
+                border: active ? '1px solid rgba(111,106,55,0.3)' : '1px solid rgba(111,106,55,0.13)',
                 color: active ? 'var(--color-accent)' : 'var(--color-muted)',
               }}>{label}</button>
             )

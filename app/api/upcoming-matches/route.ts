@@ -50,7 +50,7 @@ async function fetchCompetition(
       {
         signal: controller.signal,
         headers: { 'X-Auth-Token': key },
-        next: { revalidate: 1800 },
+        cache: 'no-store',
       },
     )
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -83,7 +83,7 @@ async function fetchCompetition(
   }
 }
 
-export const revalidate = 1800
+export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<MatchesResponse>> {
   const key = process.env.FOOTBALL_DATA_API_KEY

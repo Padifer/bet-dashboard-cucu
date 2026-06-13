@@ -14,10 +14,10 @@ export default function Navbar({ onAddBet }: NavbarProps) {
     return (
       <Link href={href} style={{
         padding: '6px 14px', fontSize: 13, fontWeight: 600,
-        color: active ? '#F5A623' : '#64748B',
-        background: active ? 'rgba(245,166,35,0.08)' : 'transparent',
+        color: active ? '#F7F5EC' : 'rgba(247,245,236,0.55)',
+        background: active ? 'rgba(247,245,236,0.15)' : 'transparent',
         border: '1px solid',
-        borderColor: active ? 'rgba(245,166,35,0.25)' : 'transparent',
+        borderColor: active ? 'rgba(247,245,236,0.3)' : 'transparent',
         borderRadius: 8, textDecoration: 'none',
         display: 'inline-flex', alignItems: 'center',
         transition: 'color 0.15s',
@@ -28,27 +28,27 @@ export default function Navbar({ onAddBet }: NavbarProps) {
   return (
     <nav style={{
       position: 'sticky', top: 0, zIndex: 40,
-      background: '#152030',
-      borderBottom: '1px solid rgba(255,255,255,0.08)',
+      background: '#6F6A37',
+      borderBottom: '1px solid rgba(0,0,0,0.12)',
       paddingTop: 'env(safe-area-inset-top)',
     }}>
       <div style={{
         maxWidth: 1200, margin: '0 auto',
-        padding: '0 24px', height: 54,
+        padding: '0 24px', height: 56,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <span style={{ fontSize: 22, lineHeight: 1 }}>⚽</span>
+          <span style={{ fontSize: 24, lineHeight: 1 }}>⚽</span>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
             <span style={{
-              fontSize: 16, fontWeight: 900, letterSpacing: '-0.02em',
-              color: '#F5A623',
+              fontSize: 17, fontWeight: 900, letterSpacing: '-0.02em',
+              color: '#F7F5EC',
               fontStyle: 'italic',
               textTransform: 'uppercase',
             }}>Mundial</span>
             <span style={{
-              fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
-              color: 'rgba(255,255,255,0.5)',
+              fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
+              color: 'rgba(247,245,236,0.6)',
               textTransform: 'uppercase',
             }}>de los Chunguitos</span>
           </div>
@@ -59,7 +59,11 @@ export default function Navbar({ onAddBet }: NavbarProps) {
           {tab('/bets', 'Bets')}
           {tab('/bank', 'Bank')}
           {tab('/fixtures', 'Fixtures')}
-          <button className="btn-primary" onClick={onAddBet} style={{ padding: '7px 16px', fontSize: 13 }}>
+          <button onClick={onAddBet} style={{
+            padding: '7px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            background: '#F7F5EC', color: '#6F6A37',
+            border: 'none', borderRadius: 6,
+          }}>
             + Add Bet
           </button>
         </div>

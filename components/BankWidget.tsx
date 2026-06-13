@@ -95,7 +95,7 @@ export default function BankWidget({ transactions, total, pabloTotal, albertoTot
                 onClick={() => setExpanded(v => !v)}
                 style={{
                   padding: '8px 12px', borderRadius: 10, fontSize: 12, cursor: 'pointer',
-                  background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                  background: 'rgba(111,106,55,0.07)', border: '1px solid rgba(111,106,55,0.15)',
                   color: 'var(--color-muted)', whiteSpace: 'nowrap',
                 }}
               >
@@ -108,7 +108,7 @@ export default function BankWidget({ transactions, total, pabloTotal, albertoTot
         {/* Transaction history */}
         {expanded && sorted.length > 0 && (
           <div style={{
-            borderTop: '1px solid rgba(255,255,255,0.06)',
+            borderTop: '1px solid rgba(111,106,55,0.09)',
             padding: '8px 24px 14px',
             display: 'flex', flexDirection: 'column', gap: 5,
           }}>

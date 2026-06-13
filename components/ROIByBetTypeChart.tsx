@@ -23,7 +23,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
   const d = payload[0].payload
   const color = d.roi >= 0 ? 'var(--color-win)' : 'var(--color-loss)'
   return (
-    <div style={{ background: '#0e0e2a', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, padding: '10px 14px', fontSize: 13 }}>
+    <div style={{ background: '#0e0e2a', border: '1px solid rgba(111,106,55,0.18)', borderRadius: 10, padding: '10px 14px', fontSize: 13 }}>
       <div style={{ fontWeight: 700, marginBottom: 4 }}>{d.betType}</div>
       <div style={{ color, fontWeight: 800 }}>ROI: {d.roi >= 0 ? '+' : ''}{d.roi.toFixed(1)}%</div>
       <div style={{ color, fontSize: 12 }}>Profit: {fmtPnL(d.profit)}</div>
@@ -52,11 +52,11 @@ export default function ROIByBetTypeChart({ data }: Props) {
       </div>
       <ResponsiveContainer width="100%" height={220} minWidth={0}>
         <BarChart data={shortened} margin={{ top: 4, right: 8, left: 0, bottom: 4 }} barSize={28}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(111,106,55,0.07)" vertical={false} />
           <XAxis dataKey="short" tick={{ fill: 'var(--color-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fill: 'var(--color-muted)', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} width={44} />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
-          <ReferenceLine y={0} stroke="rgba(255,255,255,0.15)" strokeDasharray="4 4" />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(111,106,55,0.06)' }} />
+          <ReferenceLine y={0} stroke="rgba(111,106,55,0.22)" strokeDasharray="4 4" />
           <Bar dataKey="roi" radius={[6, 6, 0, 0]}>
             {shortened.map((entry, i) => (
               <Cell key={i} fill={entry.roi >= 0 ? '#34d399' : '#f87171'} fillOpacity={0.85} />

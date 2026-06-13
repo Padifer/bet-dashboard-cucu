@@ -2,18 +2,9 @@ import { NextResponse } from 'next/server'
 
 const BASE = 'https://api.the-odds-api.com/v4/sports'
 
-// The Odds API sport keys — revalidated every 24h to stay within 500 req/month free quota
+// WC only — 1 request per fetch, well within 500/month free quota
 const SPORT_KEYS = [
   'soccer_fifa_world_cup',
-  'soccer_uefa_champs_league',
-  'soccer_uefa_europa_league',
-  'soccer_epl',
-  'soccer_england_fa_cup',
-  'soccer_italy_serie_a',
-  'soccer_italy_cup',
-  'soccer_spain_la_liga',
-  'soccer_germany_bundesliga',
-  'soccer_france_ligue_one',
 ]
 
 export interface MatchOdds {
@@ -67,7 +58,7 @@ async function fetchSport(key: string, apiKey: string): Promise<MatchOdds[]> {
   try {
     const res = await fetch(
       `${BASE}/${key}/odds/?apiKey=${apiKey}&regions=eu&markets=h2h&oddsFormat=decimal`,
-      { signal: controller.signal, next: { revalidate: 43200 } },
+      { signal: controller.signal, cache: 'no-store' },
     )
     if (!res.ok) return []
     const data = (await res.json()) as ApiMatch[]
@@ -91,7 +82,7 @@ async function fetchSport(key: string, apiKey: string): Promise<MatchOdds[]> {
   }
 }
 
-export const revalidate = 86400 // 24h — 10 keys × 1/day × 30 = 300 req/month (within free quota)
+export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<OddsResponse>> {
   const apiKey = process.env.ODDS_API_KEY

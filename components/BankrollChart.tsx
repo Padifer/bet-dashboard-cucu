@@ -18,7 +18,7 @@ function CustomTooltip({ active, payload, bankrollStart }: { active?: boolean; p
   const delta = val - bankrollStart
   const color = delta >= 0 ? 'var(--color-win)' : 'var(--color-loss)'
   return (
-    <div style={{ background: '#0e0e2a', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, padding: '10px 14px', fontSize: 13 }}>
+    <div style={{ background: '#0e0e2a', border: '1px solid rgba(111,106,55,0.18)', borderRadius: 10, padding: '10px 14px', fontSize: 13 }}>
       <div style={{ color: 'var(--color-muted)', marginBottom: 4 }}>{d.date}</div>
       <div style={{ fontWeight: 700, fontSize: 15 }}>{fmt(val)}</div>
       <div style={{ color, fontSize: 12, marginTop: 2 }}>{fmtPnL(delta)} P&L</div>
@@ -65,12 +65,12 @@ export default function BankrollChart({ data, bankrollStart, onBankrollStartChan
                   value={draft}
                   onChange={e => setDraft(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setEditing(false) }}
-                  style={{ width: 70, padding: '3px 8px', borderRadius: 6, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(79,142,247,0.5)', color: 'var(--color-text)', fontSize: 13, outline: 'none' }}
+                  style={{ width: 70, padding: '3px 8px', borderRadius: 6, background: 'rgba(111,106,55,0.13)', border: '1px solid rgba(79,142,247,0.5)', color: 'var(--color-text)', fontSize: 13, outline: 'none' }}
                 />
                 <button onClick={handleSave} style={{ background: 'rgba(0,230,118,0.2)', border: '1px solid rgba(0,230,118,0.3)', borderRadius: 6, color: 'var(--color-win)', cursor: 'pointer', padding: '3px 8px', fontSize: 11 }}>✓</button>
               </div>
             ) : (
-              <button onClick={handleEdit} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, color: 'var(--color-muted)', cursor: 'pointer', padding: '3px 10px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <button onClick={handleEdit} style={{ background: 'rgba(111,106,55,0.07)', border: '1px solid rgba(111,106,55,0.15)', borderRadius: 6, color: 'var(--color-muted)', cursor: 'pointer', padding: '3px 10px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
                 {bankrollStart > 0 ? fmt(bankrollStart) : 'Set'} <span style={{ fontSize: 10 }}>✏️</span>
               </button>
             )}
@@ -101,11 +101,11 @@ export default function BankrollChart({ data, bankrollStart, onBankrollStartChan
                 <stop offset="95%" stopColor={lineColor} stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(111,106,55,0.07)" vertical={false} />
             <XAxis dataKey="date" tick={{ fill: 'var(--color-muted)', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => v ? v.slice(5) : ''} />
             <YAxis tick={{ fill: 'var(--color-muted)', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => fmtK(v)} width={60} />
             <Tooltip content={<CustomTooltip bankrollStart={bankrollStart} />} />
-            {bankrollStart > 0 && <ReferenceLine y={bankrollStart} stroke="rgba(255,255,255,0.2)" strokeDasharray="4 4" label={{ value: 'start', fill: 'rgba(255,255,255,0.3)', fontSize: 10 }} />}
+            {bankrollStart > 0 && <ReferenceLine y={bankrollStart} stroke="rgba(111,106,55,0.26)" strokeDasharray="4 4" label={{ value: 'start', fill: 'rgba(255,255,255,0.3)', fontSize: 10 }} />}
             <Area type="monotone" dataKey="profit" stroke={lineColor} strokeWidth={2.5} fill="url(#bankrollGrad)"
               dot={{ fill: lineColor, r: 4, strokeWidth: 0 }}
               activeDot={{ r: 6, fill: lineColor, strokeWidth: 2, stroke: 'rgba(255,255,255,0.3)' }}

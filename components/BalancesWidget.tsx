@@ -65,7 +65,7 @@ function Line({ label, value, color, bold }: { label: string; value: number | nu
   const isZero = value === 0
   const c = color ?? (isZero || value === null ? 'var(--color-muted)' : value > 0 ? 'var(--color-win)' : 'var(--color-loss)')
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '4px 0', borderBottom: '1px solid rgba(111,106,55,0.06)' }}>
       <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>{label}</span>
       <span style={{ fontSize: bold ? 14 : 13, fontWeight: bold ? 700 : 500, color: c, fontVariantNumeric: 'tabular-nums' }}>
         {value === null || isZero ? '—' : (value > 0 ? '+' : '') + fmt(value)}
@@ -104,7 +104,7 @@ export default function BalancesWidget({ bets, transactions }: Props) {
   return (
     <div className="glass-card fade-up" style={{ padding: 0, overflow: 'hidden' }}>
       {/* Header */}
-      <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(111,106,55,0.12)', display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ fontSize: 20 }}>💰</span>
         <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.01em' }}>Balances & Settlement</span>
         <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--color-muted)' }}>Bets split 50/50</span>
@@ -115,7 +115,7 @@ export default function BalancesWidget({ bets, transactions }: Props) {
         {people.map((p, idx) => (
           <div key={p.name} style={{
             padding: '16px 20px',
-            borderRight: idx === 0 ? '1px solid rgba(255,255,255,0.07)' : undefined,
+            borderRight: idx === 0 ? '1px solid rgba(111,106,55,0.12)' : undefined,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
               <span style={{ fontSize: 18 }}>{p.icon}</span>
@@ -142,7 +142,7 @@ export default function BalancesWidget({ bets, transactions }: Props) {
             {p.isOwed > 0 && <Line label={`${p.otherName} owes`}          value={p.isOwed} color="#fbbf24" />}
 
             {/* Net */}
-            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(111,106,55,0.15)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <div>
                   <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Net position</span>
@@ -163,7 +163,7 @@ export default function BalancesWidget({ bets, transactions }: Props) {
       {/* Settlement banner */}
       <div style={{
         padding: '18px 24px',
-        borderTop: '1px solid rgba(255,255,255,0.07)',
+        borderTop: '1px solid rgba(111,106,55,0.12)',
         background: !debtor ? 'rgba(52,211,153,0.04)' : 'rgba(251,191,36,0.04)',
         display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
       }}>
@@ -187,7 +187,7 @@ export default function BalancesWidget({ bets, transactions }: Props) {
 
       {/* Pending footnote */}
       {pendingStake > 0 && (
-        <div style={{ padding: '8px 20px', borderTop: '1px solid rgba(255,255,255,0.04)', fontSize: 11, color: 'var(--color-muted)', opacity: 0.6 }}>
+        <div style={{ padding: '8px 20px', borderTop: '1px solid rgba(111,106,55,0.06)', fontSize: 11, color: 'var(--color-muted)', opacity: 0.6 }}>
           {fmt(pendingStake)} in pending stakes included — settlement will update when bets resolve.
         </div>
       )}

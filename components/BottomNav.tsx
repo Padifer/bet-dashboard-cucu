@@ -24,8 +24,8 @@ export default function BottomNav() {
     display: 'flex', flexDirection: 'column',
     alignItems: 'center', justifyContent: 'center',
     gap: 3, textDecoration: 'none', borderRadius: 9999,
-    color: active ? 'var(--color-accent)' : 'rgba(255,255,255,0.45)',
-    background: active ? 'rgba(245,166,35,0.1)' : 'transparent',
+    color: active ? '#F7F5EC' : 'rgba(247,245,236,0.5)',
+    background: active ? 'rgba(247,245,236,0.18)' : 'transparent',
     transition: 'color 0.15s, background 0.15s',
   })
 
@@ -40,13 +40,13 @@ export default function BottomNav() {
         display: 'flex',
         alignItems: 'center',
         gap: 2,
-        background: 'rgba(21, 32, 48, 0.97)',
+        background: 'rgba(111, 106, 55, 0.96)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        border: '1px solid rgba(247,245,236,0.15)',
         borderRadius: 9999,
         padding: '8px 10px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.15)',
       }}>
         {leftTabs.map(({ href, icon: Icon, label }) => (
           <Link key={href} href={href} style={tabStyle(path === href)}>
@@ -61,13 +61,13 @@ export default function BottomNav() {
           style={{
             width: 44, height: 44,
             borderRadius: 9999,
-            background: 'var(--color-accent)',
-            color: '#1A2534',
+            background: '#F7F5EC',
+            color: '#6F6A37',
             border: 'none',
             fontSize: 22, fontWeight: 700,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer',
-            boxShadow: '0 4px 16px rgba(245,166,35,0.45)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
             marginInline: 4,
             flexShrink: 0,
             transition: 'transform 0.15s',

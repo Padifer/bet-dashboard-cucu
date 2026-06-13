@@ -24,7 +24,7 @@ function KPIStat({ label, value, color, sub }: { label: string; value: string; c
 }
 
 function KPIDivider() {
-  return <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,0.07)', flexShrink: 0, margin: '0 4px' }} />
+  return <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(111,106,55,0.12)', flexShrink: 0, margin: '0 4px' }} />
 }
 
 export default function Dashboard() {
@@ -74,8 +74,8 @@ export default function Dashboard() {
         position: 'sticky',
         top: 'calc(56px + env(safe-area-inset-top))',
         zIndex: 39,
-        background: '#152030',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        background: '#EAE7D5',
+        borderBottom: '1px solid rgba(111,106,55,0.13)',
       }}>
         <div style={{
           maxWidth: 1200, margin: '0 auto',
@@ -167,7 +167,7 @@ export default function Dashboard() {
       <button className="btn-primary hide-on-mobile" onClick={() => setShowModal(true)} style={{
         position: 'fixed', bottom: 24, right: 24, width: 52, height: 52,
         borderRadius: '50%', fontSize: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 6px 24px rgba(245,166,35,0.4)', zIndex: 30,
+        boxShadow: '0 6px 24px rgba(111,106,55,0.3)', zIndex: 30,
       }} aria-label="Add bet">+</button>
 
       {showModal && <AddBetModal onClose={() => setShowModal(false)} onAdd={addBet} />}
