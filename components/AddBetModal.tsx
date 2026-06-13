@@ -1,7 +1,7 @@
 'use client'
 import { useState, useRef } from 'react'
 import { Bet, BetResult, BetPicker, BetFunder } from '@/types/bet'
-import { fmtPnL } from '@/utils/currency'
+import { fmt, fmtPnL } from '@/utils/currency'
 import { supabase } from '@/lib/supabase'
 
 interface AddBetModalProps {
@@ -178,12 +178,17 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
                 padding: '10px 14px', borderRadius: 7,
                 background: 'rgba(61,214,140,0.07)',
                 border: '1px solid rgba(61,214,140,0.15)',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12,
               }}>
-                <span style={{ fontSize: 13, color: 'var(--color-muted)' }}>Potential win</span>
-                <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--color-win)' }}>
-                  {fmtPnL(potentialWin)}
-                </span>
+                <span style={{ fontSize: 13, color: 'var(--color-muted)' }}>If win</span>
+                <div style={{ display: 'flex', gap: 16, alignItems: 'baseline' }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text)' }}>
+                    {fmt(parseFloat((stakeNum * oddsNum).toFixed(2)))} total
+                  </span>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--color-win)' }}>
+                    {fmtPnL(potentialWin)} profit
+                  </span>
+                </div>
               </div>
             )}
 

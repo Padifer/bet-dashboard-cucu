@@ -89,26 +89,40 @@ function BetCard({ bet, onEdit, onDelete }: { bet: Bet; onEdit: (b: Bet) => void
       </div>
 
       {/* Stats row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div>
-          <div style={{ fontSize: 10, color: 'var(--color-muted)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Odds</div>
-          <div className="num" style={{ fontSize: 16, fontWeight: 700 }}>{bet.odds.toFixed(2)}</div>
-        </div>
-        <div>
-          <div style={{ fontSize: 10, color: 'var(--color-muted)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Stake</div>
-          <div className="num" style={{ fontSize: 16, fontWeight: 700 }}>{fmt(bet.stake)}</div>
-        </div>
-        <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-          <div style={{ fontSize: 10, color: 'var(--color-muted)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            {bet.result === 'pending' ? 'To win' : 'P&L'}
+      {(() => {
+        const totalReturn = bet.result === 'loss' ? 0
+          : bet.result === 'void' ? bet.stake
+          : parseFloat((bet.stake * bet.odds).toFixed(2))  // win or pending
+        const pnl = bet.result === 'pending'
+          ? parseFloat(((bet.stake * bet.odds) - bet.stake).toFixed(2))
+          : bet.profit
+        const totalLabel = bet.result === 'pending' ? 'Total if win'
+          : bet.result === 'void' ? 'Returned'
+          : 'Total return'
+        const pnlLabel = bet.result === 'pending' ? 'Profit' : 'P&L'
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div>
+              <div style={{ fontSize: 10, color: 'var(--color-muted)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Odds</div>
+              <div className="num" style={{ fontSize: 16, fontWeight: 700 }}>{bet.odds.toFixed(2)}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 10, color: 'var(--color-muted)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Stake</div>
+              <div className="num" style={{ fontSize: 16, fontWeight: 700 }}>{fmt(bet.stake)}</div>
+            </div>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 14, alignItems: 'flex-end' }}>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 10, color: 'var(--color-muted)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{totalLabel}</div>
+                <div className="num" style={{ fontSize: 16, fontWeight: 700 }}>{fmt(totalReturn)}</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 10, color: 'var(--color-muted)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{pnlLabel}</div>
+                <div className="num" style={{ fontSize: 20, fontWeight: 800, color: c, letterSpacing: '-0.02em' }}>{fmtPnL(pnl)}</div>
+              </div>
+            </div>
           </div>
-          <div className="num" style={{ fontSize: 20, fontWeight: 800, color: c, letterSpacing: '-0.02em' }}>
-            {bet.result === 'pending'
-              ? fmtPnL(parseFloat(((bet.stake * bet.odds) - bet.stake).toFixed(2)))
-              : fmtPnL(bet.profit)}
-          </div>
-        </div>
-      </div>
+        )
+      })()}
 
       {/* Footer: picker + actions */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 6, borderTop: '1px solid rgba(240,235,224,0.05)' }}>
