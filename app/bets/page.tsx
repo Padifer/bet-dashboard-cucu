@@ -273,43 +273,45 @@ export default function BetsPage() {
       }}>
         <div style={{
           maxWidth: 700, margin: '0 auto',
-          padding: '10px 16px',
-          display: 'flex', gap: 8, alignItems: 'center', overflowX: 'auto',
+          padding: '8px 16px',
+          display: 'flex', flexDirection: 'column', gap: 6,
         }}>
-          {filterTabs.map(({ key, label, count }) => {
-            const active = filter === key
-            return (
-              <button key={key} className="pill-btn" onClick={() => setFilter(key)} style={{
-                padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
-                background: active ? 'rgba(129,140,248,0.18)' : 'rgba(240,235,224,0.04)',
-                border: active ? '1px solid rgba(129,140,248,0.4)' : '1px solid rgba(240,235,224,0.08)',
-                color: active ? 'var(--color-accent)' : 'var(--color-muted)',
-              }}>
-                {label} <span style={{ opacity: 0.7, fontSize: 11 }}>{count}</span>
-              </button>
-            )
-          })}
-
-          <div style={{ width: 1, height: 16, background: 'rgba(240,235,224,0.1)', flexShrink: 0 }} />
-
-          {(['30d', '90d', 'all'] as const).map(r => {
-            const active = dateRange === r
-            return (
-              <button key={r} className="pill-btn" onClick={() => setDateRange(r)} style={{
-                padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
-                background: active ? 'rgba(129,140,248,0.12)' : 'rgba(240,235,224,0.04)',
-                border: active ? '1px solid rgba(129,140,248,0.3)' : '1px solid rgba(240,235,224,0.08)',
-                color: active ? 'var(--color-accent)' : 'var(--color-muted)',
-              }}>{r === 'all' ? 'All time' : r}</button>
-            )
-          })}
-
-          <select value={sortBy} onChange={e => setSortBy(e.target.value as SortBy)}
-            style={{ marginLeft: 'auto', padding: '6px 10px', borderRadius: 8, fontSize: 12, background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.08)', color: 'var(--color-muted)', cursor: 'pointer', outline: 'none', flexShrink: 0 }}>
-            <option value="date">↓ Date</option>
-            <option value="profit">↓ Profit</option>
-            <option value="odds">↓ Odds</option>
-          </select>
+          {/* Row 1: result filters + sort */}
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+            {filterTabs.map(({ key, label, count }) => {
+              const active = filter === key
+              return (
+                <button key={key} className="pill-btn" onClick={() => setFilter(key)} style={{
+                  padding: '5px 12px', borderRadius: 20, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                  background: active ? 'rgba(129,140,248,0.18)' : 'rgba(240,235,224,0.04)',
+                  border: active ? '1px solid rgba(129,140,248,0.4)' : '1px solid rgba(240,235,224,0.08)',
+                  color: active ? 'var(--color-accent)' : 'var(--color-muted)',
+                }}>
+                  {label} <span style={{ opacity: 0.7, fontSize: 11 }}>{count}</span>
+                </button>
+              )
+            })}
+            <select value={sortBy} onChange={e => setSortBy(e.target.value as SortBy)}
+              style={{ marginLeft: 'auto', padding: '5px 10px', borderRadius: 8, fontSize: 12, background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.08)', color: 'var(--color-muted)', cursor: 'pointer', outline: 'none' }}>
+              <option value="date">↓ Date</option>
+              <option value="profit">↓ Profit</option>
+              <option value="odds">↓ Odds</option>
+            </select>
+          </div>
+          {/* Row 2: date range filters */}
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            {(['30d', '90d', 'all'] as const).map(r => {
+              const active = dateRange === r
+              return (
+                <button key={r} className="pill-btn" onClick={() => setDateRange(r)} style={{
+                  padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                  background: active ? 'rgba(129,140,248,0.12)' : 'rgba(240,235,224,0.04)',
+                  border: active ? '1px solid rgba(129,140,248,0.3)' : '1px solid rgba(240,235,224,0.08)',
+                  color: active ? 'var(--color-accent)' : 'var(--color-muted)',
+                }}>{r === 'all' ? 'All time' : r}</button>
+              )
+            })}
+          </div>
         </div>
       </div>
 

@@ -93,15 +93,12 @@ export default function Dashboard() {
                 <div key={name} style={{
                   background: light ? '#F0EBE0' : '#223022',
                   border: `1px solid ${light ? 'rgba(27,43,27,0.1)' : 'rgba(240,235,224,0.07)'}`,
-                  borderRadius: 12, padding: '18px 22px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  borderRadius: 12, padding: '18px 18px',
                 }}>
-                  <div>
-                    <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6, color: light ? 'rgba(27,43,27,0.4)' : 'rgba(240,235,224,0.4)' }}>{name}</div>
-                    <div className="num" style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, color: rColor }}>{s.roi >= 0 ? '+' : ''}{s.roi.toFixed(1)}%</div>
-                    <div style={{ fontSize: 11, marginTop: 5, color: light ? 'rgba(27,43,27,0.38)' : 'rgba(240,235,224,0.35)' }}>{s.wins}W / {s.losses}L · {wr}% hit</div>
-                  </div>
-                  <div className="num" style={{ fontSize: 20, fontWeight: 800, color: rColor }}>{fmtPnL(s.profit)}</div>
+                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6, color: light ? 'rgba(27,43,27,0.4)' : 'rgba(240,235,224,0.4)' }}>{name}</div>
+                  <div className="num" style={{ fontSize: 26, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, color: rColor }}>{s.roi >= 0 ? '+' : ''}{s.roi.toFixed(1)}%</div>
+                  <div style={{ fontSize: 11, marginTop: 4, color: light ? 'rgba(27,43,27,0.38)' : 'rgba(240,235,224,0.35)' }}>{s.wins}W / {s.losses}L · {wr}%</div>
+                  <div className="num" style={{ fontSize: 16, fontWeight: 800, marginTop: 6, color: rColor }}>{fmtPnL(s.profit)}</div>
                 </div>
               )
             })}
