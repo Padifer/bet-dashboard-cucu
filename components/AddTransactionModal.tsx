@@ -5,7 +5,7 @@ import { fmt } from '@/utils/currency'
 
 interface Props {
   onClose: () => void
-  onAdd: (tx: Omit<BankTransaction, 'id'>) => void
+  onAdd: (tx: Omit<BankTransaction, 'id'>) => Promise<void>
   defaultType?: 'deposit' | 'withdrawal'
 }
 
@@ -44,20 +44,22 @@ export default function AddTransactionModal({ onClose, onAdd, defaultType }: Pro
   const halfA = isValid ? Math.floor(amtNum * 100 / 2) / 100 : 0
   const halfB = isValid ? parseFloat((amtNum - halfA).toFixed(2)) : 0
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!isValid) return
     const createdAt = new Date(datetime).toISOString()
     const noteVal = note.trim() || undefined
 
     if (isDebt) {
-      onAdd({ type: 'debt', amount: amtNum, person: debtor, debtCreditor: creditor, note: noteVal, createdAt })
+      await onAdd({ type: 'debt', amount: amtNum, person: debtor, debtCreditor: creditor, note: noteVal, createdAt })
     } else if (person === 'Both') {
       const groupId = newGroupId()
-      onAdd({ type: tab as TransactionType, amount: halfA, person: 'Pablo',  groupId, note: noteVal, createdAt })
-      onAdd({ type: tab as TransactionType, amount: halfB, person: 'Alberto', groupId, note: noteVal, createdAt })
+      await Promise.all([
+        onAdd({ type: tab as TransactionType, amount: halfA, person: 'Pablo',   groupId, note: noteVal, createdAt }),
+        onAdd({ type: tab as TransactionType, amount: halfB, person: 'Alberto', groupId, note: noteVal, createdAt }),
+      ])
     } else {
-      onAdd({ type: tab as TransactionType, amount: amtNum, person, note: noteVal, createdAt })
+      await onAdd({ type: tab as TransactionType, amount: amtNum, person, note: noteVal, createdAt })
     }
     onClose()
   }

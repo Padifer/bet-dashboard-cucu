@@ -123,7 +123,7 @@ export default function BankWidget({ transactions, onAdd, onDelete, onDeleteGrou
       {showModal && (
         <AddTransactionModal
           onClose={() => setShowModal(false)}
-          onAdd={tx => { onAdd(tx); setShowModal(false) }}
+          onAdd={async tx => { await onAdd(tx); setShowModal(false) }}
         />
       )}
     </>

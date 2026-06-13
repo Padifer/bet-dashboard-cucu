@@ -65,6 +65,13 @@ export default function BankPage() {
   const pabloColor = adjustedPabloTotal >= 0 ? '#6EC200' : '#E85C2A'
   const alberColor = adjustedAlbertoTotal >= 0 ? '#1B6B1B' : '#B03020'
 
+  // Sub-text helpers: raw deposits vs withdrawals per person (debts excluded)
+  const cashTxs = transactions.filter(t => t.type !== 'debt')
+  const pIn  = cashTxs.filter(t => t.person === 'Pablo'   && t.type === 'deposit').reduce((s, t) => s + t.amount, 0)
+  const pOut = cashTxs.filter(t => t.person === 'Pablo'   && t.type === 'withdrawal').reduce((s, t) => s + t.amount, 0)
+  const aIn  = cashTxs.filter(t => t.person === 'Alberto' && t.type === 'deposit').reduce((s, t) => s + t.amount, 0)
+  const aOut = cashTxs.filter(t => t.person === 'Alberto' && t.type === 'withdrawal').reduce((s, t) => s + t.amount, 0)
+
   function openTx(type: 'deposit' | 'withdrawal') {
     setTxType(type); setShowTxModal(true)
   }
@@ -84,20 +91,20 @@ export default function BankPage() {
           <BigCard
             label="Bank Balance"
             value={loaded ? fmt(adjustedBankTotal) : '…'}
-            sub={loaded ? `${transactions.length} transactions` : undefined}
+            sub={loaded ? `${cashTxs.length} transactions · ${bankFundedImpact !== 0 ? (bankFundedImpact > 0 ? `+${fmt(bankFundedImpact)} from bets` : `${fmt(bankFundedImpact)} in bets`) : 'no bets impact'}` : undefined}
             light
             valueColor={bankColor}
           />
           <BigCard
             label="Pablo"
             value={loaded ? fmt(adjustedPabloTotal) : '…'}
-            sub="net contributed"
+            sub={loaded ? `${fmt(pIn)} in · ${fmt(pOut)} out` : undefined}
             valueColor={pabloColor}
           />
           <BigCard
             label="Alberto"
             value={loaded ? fmt(adjustedAlbertoTotal) : '…'}
-            sub="net contributed"
+            sub={loaded ? `${fmt(aIn)} in · ${fmt(aOut)} out` : undefined}
             light
             valueColor={alberColor}
           />
