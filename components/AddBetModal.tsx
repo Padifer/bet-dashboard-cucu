@@ -18,12 +18,12 @@ function calcProfit(odds: number, stake: number, result: BetResult): number {
   return 0
 }
 
-async function uploadSlip(file: File): Promise<string | null> {
+async function uploadSlip(file: File): Promise<{ url: string | null; error: string | null }> {
   const ext = file.name.split('.').pop() ?? 'jpg'
   const path = `${Date.now()}.${ext}`
   const { data, error } = await supabase.storage.from('bet-slips').upload(path, file, { contentType: file.type })
-  if (error || !data) return null
-  return supabase.storage.from('bet-slips').getPublicUrl(data.path).data.publicUrl
+  if (error || !data) return { url: null, error: error?.message ?? 'Upload failed' }
+  return { url: supabase.storage.from('bet-slips').getPublicUrl(data.path).data.publicUrl, error: null }
 }
 
 export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill }: AddBetModalProps) {
@@ -32,6 +32,7 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
   const [slipPreview, setSlipPreview] = useState<string | null>(editBet?.slipUrl ?? null)
   const [uploading, setUploading]   = useState(false)
   const [dragOver, setDragOver]     = useState(false)
+  const [slipError, setSlipError]   = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({
     date:     editBet?.date    ?? new Date().toISOString().slice(0, 10),
@@ -64,10 +65,12 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
     e.preventDefault()
     if (!valid) return
     setUploading(true)
+    setSlipError(null)
     let slipUrl = editBet?.slipUrl ?? undefined
     if (slipFile) {
-      const uploaded = await uploadSlip(slipFile)
-      if (uploaded) slipUrl = uploaded
+      const { url, error } = await uploadSlip(slipFile)
+      if (error) { setSlipError(`Slip upload failed: ${error}`); setUploading(false); return }
+      if (url) slipUrl = url
     }
     const profit = calcProfit(oddsNum, stakeNum, form.result)
     const description = form.match.trim() || `Bet @ ${form.odds}`
@@ -337,6 +340,11 @@ export default function AddBetModal({ onClose, onAdd, editBet, onUpdate, prefill
                 >
                   {dragOver ? '⬇ Drop to attach' : '📎 Attach slip image'}
                 </button>
+              )}
+              {slipError && (
+                <div style={{ marginTop: 8, padding: '8px 12px', borderRadius: 7, background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)', color: 'var(--color-loss)', fontSize: 12 }}>
+                  {slipError}
+                </div>
               )}
             </div>
 
