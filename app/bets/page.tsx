@@ -149,24 +149,19 @@ function BetCard({ bet, onEdit, onDelete, onSettle, onUndo }: {
         </div>
       )}
 
-      {/* Slip image thumbnail + fullscreen viewer */}
-      {bet.slipUrl && (
-        <>
-          <img
-            src={bet.slipUrl}
-            alt="Bet slip"
-            onClick={() => setSlipOpen(true)}
-            style={{ width: '100%', maxHeight: 90, objectFit: 'cover', borderRadius: 8, cursor: 'zoom-in', border: '1px solid rgba(240,235,224,0.08)' }}
-          />
-          {slipOpen && (
-            <div
-              onClick={() => setSlipOpen(false)}
-              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
-            >
-              <img src={bet.slipUrl} alt="Bet slip" style={{ maxWidth: '100%', maxHeight: '90dvh', objectFit: 'contain', borderRadius: 10 }} />
-            </div>
-          )}
-        </>
+      {/* Fullscreen slip lightbox */}
+      {bet.slipUrl && slipOpen && (
+        <div
+          onClick={() => setSlipOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.94)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+        >
+          <img src={bet.slipUrl} alt="Bet slip" style={{ maxWidth: '100%', maxHeight: '90dvh', objectFit: 'contain', borderRadius: 10 }} />
+          <button onClick={e => { e.stopPropagation(); setSlipOpen(false) }} style={{
+            position: 'absolute', top: 16, right: 16, width: 36, height: 36, borderRadius: '50%',
+            background: 'rgba(240,235,224,0.12)', border: '1px solid rgba(240,235,224,0.2)',
+            color: '#F0EBE0', fontSize: 18, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>✕</button>
+        </div>
       )}
 
       {/* Footer: picker + actions */}
@@ -178,6 +173,12 @@ function BetCard({ bet, onEdit, onDelete, onSettle, onUndo }: {
           )}
         </span>
         <div style={{ display: 'flex', gap: 6 }}>
+          {bet.slipUrl && (
+            <button onClick={() => setSlipOpen(true)} style={{
+              padding: '5px 12px', borderRadius: 7, fontSize: 12, cursor: 'pointer', fontWeight: 600,
+              background: 'rgba(240,235,224,0.06)', border: '1px solid rgba(240,235,224,0.18)', color: 'var(--color-text)',
+            }}>📎 Slip</button>
+          )}
           {bet.result !== 'pending' && (
             <button onClick={() => onUndo(bet.id)} style={{
               padding: '5px 12px', borderRadius: 7, fontSize: 12, cursor: 'pointer', fontWeight: 600,

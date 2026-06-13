@@ -9,7 +9,7 @@ import BankrollChart from '@/components/BankrollChart'
 import WinLossDonut from '@/components/WinLossDonut'
 import PickerStatsCard from '@/components/PickerStatsCard'
 import OddsBandChart from '@/components/OddsBandChart'
-import MonthlyPnLChart from '@/components/MonthlyPnLChart'
+import DailyPnLChart from '@/components/DailyPnLChart'
 import AddBetModal from '@/components/AddBetModal'
 import BottomNav from '@/components/BottomNav'
 
@@ -129,7 +129,7 @@ export default function Dashboard() {
         <div className="grid-charts-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
           <PickerStatsCard stats={stats} />
           <OddsBandChart data={oddsBandData} />
-          <MonthlyPnLChart data={monthlyPnL} />
+          <DailyPnLChart data={dailyPnL} />
         </div>
       </main>
 
