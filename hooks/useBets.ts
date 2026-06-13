@@ -142,6 +142,51 @@ function computeMonthlyPnL(bets: Bet[]): MonthlyPnL[] {
     .map(([, v]) => ({ month: v.label, profit: v.profit, bets: v.bets }))
 }
 
+export interface OddsBand {
+  label: string
+  bets: number
+  wins: number
+  roi: number
+  profit: number
+}
+
+export interface DailyPnL {
+  day: string   // 'MM/DD'
+  profit: number
+  bets: number
+}
+
+function computeOddsBands(bets: Bet[]): OddsBand[] {
+  const BANDS = [
+    { label: '1-2', min: 1, max: 2 },
+    { label: '2-5', min: 2, max: 5 },
+    { label: '5-15', min: 5, max: 15 },
+    { label: '15+', min: 15, max: Infinity },
+  ]
+  return BANDS.map(({ label, min, max }) => {
+    const settled = bets.filter(b =>
+      b.odds >= min && b.odds < max &&
+      (b.result === 'win' || b.result === 'loss')
+    )
+    const wins = settled.filter(b => b.result === 'win').length
+    const stake = settled.reduce((s, b) => s + b.stake, 0)
+    const profit = settled.reduce((s, b) => s + b.profit, 0)
+    return { label, bets: settled.length, wins, roi: stake > 0 ? (profit / stake) * 100 : 0, profit }
+  }).filter(b => b.bets > 0)
+}
+
+function computeDailyPnL(bets: Bet[]): DailyPnL[] {
+  const map = new Map<string, { profit: number; bets: number }>()
+  for (const b of bets.filter(b => b.result !== 'pending' && b.result !== 'void')) {
+    const key = b.date
+    const cur = map.get(key) ?? { profit: 0, bets: 0 }
+    map.set(key, { profit: parseFloat((cur.profit + b.profit).toFixed(2)), bets: cur.bets + 1 })
+  }
+  return [...map.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([day, v]) => ({ day: day.slice(5).replace('-', '/'), profit: v.profit, bets: v.bets }))
+}
+
 // ── Hook ───────────────────────────────────────────────────────────────────────
 
 const BANKROLL_KEY = 'bet-dashboard-bankroll-start'
@@ -220,6 +265,8 @@ export function useBets() {
     roiByCompetition: computeRoiByCompetition(bets),
     roiByBetType:     computeRoiByBetType(bets),
     monthlyPnL:       computeMonthlyPnL(bets),
+    oddsBandData:     computeOddsBands(bets),
+    dailyPnL:         computeDailyPnL(bets),
     bankrollStart, setBankrollStart,
   }
 }

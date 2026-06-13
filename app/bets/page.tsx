@@ -46,8 +46,15 @@ const RESULT_LABEL = { win: 'Win', loss: 'Loss', pending: 'Pending', void: 'Void
 const RESULT_ICON  = { win: '✅', loss: '❌', pending: '⏳', void: '↩️' }
 const PICKER_LABEL: Record<string, string> = { pablo: '👤 Pablo', alberto: '👥 Alberto', both: '🤝 Both' }
 
-function BetCard({ bet, onEdit, onDelete }: { bet: Bet; onEdit: (b: Bet) => void; onDelete: (id: string) => void }) {
+function BetCard({ bet, onEdit, onDelete, onSettle, onUndo }: {
+  bet: Bet
+  onEdit: (b: Bet) => void
+  onDelete: (id: string) => void
+  onSettle: (id: string, result: 'win' | 'loss' | 'void') => void
+  onUndo: (id: string) => void
+}) {
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [slipOpen, setSlipOpen] = useState(false)
   const c = RESULT_COLOR[bet.result]
 
   const handleDelete = () => {
@@ -124,6 +131,44 @@ function BetCard({ bet, onEdit, onDelete }: { bet: Bet; onEdit: (b: Bet) => void
         )
       })()}
 
+      {/* Settle buttons (pending only) */}
+      {bet.result === 'pending' && (
+        <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
+          <button onClick={() => onSettle(bet.id, 'win')} style={{
+            flex: 1, padding: '9px 6px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            background: 'rgba(110,194,0,0.12)', border: '1px solid rgba(110,194,0,0.35)', color: '#6EC200',
+          }}>✓ Win</button>
+          <button onClick={() => onSettle(bet.id, 'loss')} style={{
+            flex: 1, padding: '9px 6px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            background: 'rgba(232,92,42,0.12)', border: '1px solid rgba(232,92,42,0.35)', color: '#E85C2A',
+          }}>✗ Loss</button>
+          <button onClick={() => onSettle(bet.id, 'void')} style={{
+            flex: 1, padding: '9px 6px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.12)', color: 'var(--color-muted)',
+          }}>Void</button>
+        </div>
+      )}
+
+      {/* Slip image thumbnail + fullscreen viewer */}
+      {bet.slipUrl && (
+        <>
+          <img
+            src={bet.slipUrl}
+            alt="Bet slip"
+            onClick={() => setSlipOpen(true)}
+            style={{ width: '100%', maxHeight: 90, objectFit: 'cover', borderRadius: 8, cursor: 'zoom-in', border: '1px solid rgba(240,235,224,0.08)' }}
+          />
+          {slipOpen && (
+            <div
+              onClick={() => setSlipOpen(false)}
+              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+            >
+              <img src={bet.slipUrl} alt="Bet slip" style={{ maxWidth: '100%', maxHeight: '90dvh', objectFit: 'contain', borderRadius: 10 }} />
+            </div>
+          )}
+        </>
+      )}
+
       {/* Footer: picker + actions */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 6, borderTop: '1px solid rgba(240,235,224,0.05)' }}>
         <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>
@@ -133,6 +178,12 @@ function BetCard({ bet, onEdit, onDelete }: { bet: Bet; onEdit: (b: Bet) => void
           )}
         </span>
         <div style={{ display: 'flex', gap: 6 }}>
+          {bet.result !== 'pending' && (
+            <button onClick={() => onUndo(bet.id)} style={{
+              padding: '5px 12px', borderRadius: 7, fontSize: 12, cursor: 'pointer', fontWeight: 600,
+              background: 'rgba(245,200,66,0.12)', border: '1px solid rgba(245,200,66,0.3)', color: '#F5C842',
+            }}>↩ Undo</button>
+          )}
           <button onClick={() => onEdit(bet)} style={{
             padding: '5px 12px', borderRadius: 7, fontSize: 12, cursor: 'pointer', fontWeight: 600,
             background: 'rgba(129,140,248,0.1)', border: '1px solid rgba(129,140,248,0.25)',
@@ -154,7 +205,8 @@ type FilterResult = 'all' | 'win' | 'loss' | 'pending'
 type SortBy = 'date' | 'profit' | 'odds'
 
 export default function BetsPage() {
-  const { bets, addBet, deleteBet, updateBet, loaded, stats } = useBets()
+  const { bets, addBet, deleteBet, updateBet, settleBet, loaded, stats } = useBets()
+  const undo = (id: string) => updateBet(id, { result: 'pending', profit: 0 })
   const [showModal, setShowModal]   = useState(false)
   const [editingBet, setEditingBet] = useState<Bet | null>(null)
   const [filter, setFilter]         = useState<FilterResult>('all')
@@ -276,6 +328,8 @@ export default function BetsPage() {
               bet={bet}
               onEdit={setEditingBet}
               onDelete={deleteBet}
+              onSettle={settleBet}
+              onUndo={undo}
             />
           ))
         )}

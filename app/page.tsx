@@ -7,8 +7,8 @@ import Navbar from '@/components/Navbar'
 import StatsCards from '@/components/StatsCards'
 import BankrollChart from '@/components/BankrollChart'
 import WinLossDonut from '@/components/WinLossDonut'
-import ROIByCompetitionChart from '@/components/ROIByCompetitionChart'
-import ROIByBetTypeChart from '@/components/ROIByBetTypeChart'
+import PickerStatsCard from '@/components/PickerStatsCard'
+import OddsBandChart from '@/components/OddsBandChart'
 import MonthlyPnLChart from '@/components/MonthlyPnLChart'
 import AddBetModal from '@/components/AddBetModal'
 import BottomNav from '@/components/BottomNav'
@@ -33,7 +33,7 @@ function BigCard({
 export default function Dashboard() {
   const {
     bets, addBet, updateBet, loaded,
-    stats, bankrollData, roiByCompetition, roiByBetType, monthlyPnL,
+    stats, bankrollData, monthlyPnL, oddsBandData, dailyPnL,
     bankrollStart, setBankrollStart,
   } = useBets()
   const [showModal, setShowModal] = useState(false)
@@ -127,8 +127,8 @@ export default function Dashboard() {
         </div>
 
         <div className="grid-charts-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
-          <ROIByCompetitionChart data={roiByCompetition} />
-          <ROIByBetTypeChart data={roiByBetType} />
+          <PickerStatsCard stats={stats} />
+          <OddsBandChart data={oddsBandData} />
           <MonthlyPnLChart data={monthlyPnL} />
         </div>
       </main>
