@@ -48,18 +48,27 @@ function mergeOdds(matches: UpcomingMatch[], odds: MatchOdds[]): EnrichedMatch[]
 }
 
 function localDate(utc: string) {
-  const d = new Date(utc)
-  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+  return new Date(utc).toLocaleDateString('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'short',
+    timeZone: 'Asia/Bangkok',
+  })
 }
 
-function localTime(utc: string) {
-  return new Date(utc).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+function thaiTime(utc: string) {
+  return new Date(utc).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' })
+}
+
+function utcTime(utc: string) {
+  return new Date(utc).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })
 }
 
 function isToday(utc: string) {
   const d = new Date(utc)
-  const t = new Date()
-  return d.toDateString() === t.toDateString()
+  const now = new Date()
+  // compare in Thailand timezone
+  const dtThai = d.toLocaleDateString('en-GB', { timeZone: 'Asia/Bangkok' })
+  const nowThai = now.toLocaleDateString('en-GB', { timeZone: 'Asia/Bangkok' })
+  return dtThai === nowThai
 }
 
 function OddsButton({ value, label, onClick }: { value: number; label: string; onClick: () => void }) {
@@ -104,11 +113,20 @@ function MatchCard({ match, onBet }: { match: EnrichedMatch; onBet: (m: Enriched
             }}>● LIVE</span>
           )}
           {finished ? (
-            <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>FT</span>
+            <span style={{ fontSize: 12, color: 'var(--color-muted)', fontWeight: 700 }}>FT</span>
           ) : (
-            <span style={{ fontSize: 12, color: live ? 'var(--color-loss)' : 'var(--color-muted)' }}>
-              {localTime(match.utcDate)}
-            </span>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{
+                fontSize: 14, fontWeight: 800,
+                color: live ? 'var(--color-loss)' : 'var(--color-text)',
+                letterSpacing: '-0.01em',
+              }}>
+                {thaiTime(match.utcDate)} <span style={{ fontSize: 9, fontWeight: 700, opacity: 0.6, letterSpacing: '0.06em' }}>ICT</span>
+              </div>
+              <div style={{ fontSize: 10, color: 'var(--color-muted)', marginTop: 1 }}>
+                {utcTime(match.utcDate)} UTC
+              </div>
+            </div>
           )}
         </div>
       </div>
