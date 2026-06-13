@@ -13,13 +13,14 @@ export default function Navbar({ onAddBet }: NavbarProps) {
     const active = path === href
     return (
       <Link href={href} style={{
-        padding: '7px 14px', fontSize: 12, fontWeight: 600,
-        color: active ? 'var(--color-accent)' : 'var(--color-muted)',
-        background: active ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.03)',
-        border: active ? '1px solid rgba(245,166,35,0.3)' : '1px solid rgba(245,166,35,0.08)',
+        padding: '6px 14px', fontSize: 13, fontWeight: 600,
+        color: active ? '#F5A623' : '#64748B',
+        background: active ? 'rgba(245,166,35,0.08)' : 'transparent',
+        border: '1px solid',
+        borderColor: active ? 'rgba(245,166,35,0.25)' : 'transparent',
         borderRadius: 8, textDecoration: 'none',
         display: 'inline-flex', alignItems: 'center',
-        transition: 'all 0.15s',
+        transition: 'color 0.15s',
       }}>{label}</Link>
     )
   }
@@ -27,28 +28,27 @@ export default function Navbar({ onAddBet }: NavbarProps) {
   return (
     <nav style={{
       position: 'sticky', top: 0, zIndex: 40,
-      background: 'rgba(4,6,12,0.95)',
-      backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
-      borderBottom: '1px solid rgba(99,120,200,0.1)',
+      background: '#0F1117',
+      borderBottom: '1px solid rgba(255,255,255,0.07)',
       paddingTop: 'env(safe-area-inset-top)',
     }}>
       <div style={{
         maxWidth: 1200, margin: '0 auto',
-        padding: '0 24px', height: 56,
+        padding: '0 24px', height: 54,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-          <span style={{ fontSize: 18 }}>🏆</span>
-          <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--color-text)' }}>
-            WC<span style={{ color: 'var(--color-accent)' }}>26</span>
+          <span style={{ fontSize: 16 }}>🏆</span>
+          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: '#E2E8F0' }}>
+            WC<span style={{ color: '#F5A623' }}>26</span>
           </span>
         </Link>
 
         <div className="nav-tabs-top" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {tab('/', '⌂')}
+          {tab('/', 'Dashboard')}
           {tab('/bets', 'Bets')}
-          <button className="btn-primary" onClick={onAddBet} style={{ padding: '8px 16px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ fontSize: 15, lineHeight: 1 }}>+</span> Add Bet
+          <button className="btn-primary" onClick={onAddBet} style={{ padding: '7px 16px', fontSize: 13 }}>
+            + Add Bet
           </button>
         </div>
       </div>
