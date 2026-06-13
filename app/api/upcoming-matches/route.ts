@@ -21,8 +21,8 @@ export interface UpcomingMatch {
   competitionCode: string
   competitionColor: string
   competitionPriority: number
-  homeTeam: string
-  awayTeam: string
+  homeTeam: string | null
+  awayTeam: string | null
   utcDate: string
   status: string
   scoreHome: number | null
@@ -57,8 +57,8 @@ async function fetchCompetition(
     const data = (await res.json()) as {
       matches: Array<{
         id: number
-        homeTeam: { name: string }
-        awayTeam: { name: string }
+        homeTeam: { name: string | null } | null
+        awayTeam: { name: string | null } | null
         utcDate: string
         status: string
         score: { fullTime: { home: number | null; away: number | null } }
@@ -71,8 +71,8 @@ async function fetchCompetition(
       competitionCode: comp.code,
       competitionColor: comp.color,
       competitionPriority: comp.priority,
-      homeTeam: m.homeTeam.name,
-      awayTeam: m.awayTeam.name,
+      homeTeam: m.homeTeam?.name ?? null,
+      awayTeam: m.awayTeam?.name ?? null,
       utcDate: m.utcDate,
       status: m.status,
       scoreHome: m.score.fullTime.home,
@@ -91,10 +91,8 @@ export async function GET(): Promise<NextResponse<MatchesResponse>> {
     return NextResponse.json({ matches: [], total: 0, competitionsOk: 0, competitionsFailed: COMPETITIONS.length })
   }
 
-  const today = new Date()
-  const endOfTournament = new Date('2026-07-20')
-  const dateFrom = today.toISOString().slice(0, 10)
-  const dateTo = endOfTournament.toISOString().slice(0, 10)
+  const dateFrom = '2026-06-11'   // tournament start — include ALL matches (past + future)
+  const dateTo   = '2026-07-20'   // final
 
   const settled = await Promise.allSettled(
     COMPETITIONS.map(c => fetchCompetition(key, c, dateFrom, dateTo)),

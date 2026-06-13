@@ -248,8 +248,8 @@ export default function FixturesPage() {
         const oddsData = await oddsRes.json()
         const enriched = mergeOdds(matchData.matches ?? [], oddsData.odds ?? [])
         setMatches(enriched)
-      } catch {
-        setError('Could not load fixtures — check API keys')
+      } catch (e) {
+        setError(`Could not load fixtures: ${e instanceof Error ? e.message : String(e)}`)
       } finally {
         setLoading(false)
       }
