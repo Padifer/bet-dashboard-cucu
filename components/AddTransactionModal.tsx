@@ -69,11 +69,11 @@ export default function AddTransactionModal({ onClose, onAdd }: Props) {
           <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>
             {isDebt ? '📋 Record Debt' : 'New Transaction'}
           </h2>
-          <button onClick={onClose} style={{ background: 'rgba(111,106,55,0.13)', border: 'none', borderRadius: 8, color: 'var(--color-muted)', cursor: 'pointer', width: 32, height: 32, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'rgba(240,235,224,0.08)', border: 'none', borderRadius: 8, color: 'var(--color-muted)', cursor: 'pointer', width: 32, height: 32, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
         </div>
 
         {/* Tab selector */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 20, padding: 4, background: 'rgba(111,106,55,0.06)', border: '1px solid rgba(111,106,55,0.13)', borderRadius: 12 }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: 20, padding: 4, background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.08)', borderRadius: 12 }}>
           {([
             { id: 'deposit'    as TabType, label: '⬆️ Deposit',    activeColor: 'rgba(52,211,153,0.15)',  activeBorder: 'rgba(52,211,153,0.4)',  activeText: 'var(--color-win)' },
             { id: 'withdrawal' as TabType, label: '⬇️ Withdrawal', activeColor: 'rgba(248,113,113,0.15)', activeBorder: 'rgba(248,113,113,0.4)', activeText: 'var(--color-loss)' },
@@ -105,8 +105,8 @@ export default function AddTransactionModal({ onClose, onAdd }: Props) {
                   {(['Pablo', 'Alberto'] as TransactionPerson[]).map(p => (
                     <button key={p} type="button" onClick={() => setDebtor(p)} style={{
                       flex: 1, padding: '10px 6px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                      border: debtor === p ? '1.5px solid rgba(251,191,36,0.6)' : '1px solid rgba(111,106,55,0.13)',
-                      background: debtor === p ? 'rgba(251,191,36,0.12)' : 'rgba(111,106,55,0.05)',
+                      border: debtor === p ? '1.5px solid rgba(251,191,36,0.6)' : '1px solid rgba(240,235,224,0.08)',
+                      background: debtor === p ? 'rgba(251,191,36,0.12)' : 'rgba(240,235,224,0.03)',
                       color: debtor === p ? '#fbbf24' : 'var(--color-muted)',
                       transition: 'all 0.15s', fontFamily: 'inherit',
                     }}>
@@ -116,8 +116,8 @@ export default function AddTransactionModal({ onClose, onAdd }: Props) {
                   <span style={{ fontSize: 18, color: 'var(--color-muted)', padding: '0 4px' }}>→</span>
                   <div style={{
                     flex: 1, padding: '10px 6px', borderRadius: 10, fontSize: 13, fontWeight: 600, textAlign: 'center',
-                    border: '1px solid rgba(111,106,55,0.18)',
-                    background: 'rgba(111,106,55,0.06)',
+                    border: '1px solid rgba(240,235,224,0.12)',
+                    background: 'rgba(240,235,224,0.04)',
                     color: 'var(--color-text)',
                   }}>
                     {creditor === 'Pablo' ? '👤' : '👥'} {creditor}
@@ -141,8 +141,8 @@ export default function AddTransactionModal({ onClose, onAdd }: Props) {
                   ]).map(({ v, label }) => (
                     <button key={v} type="button" onClick={() => setPerson(v)} style={{
                       flex: 1, padding: '10px 6px', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                      border: person === v ? '1.5px solid rgba(129,140,248,0.6)' : '1px solid rgba(111,106,55,0.13)',
-                      background: person === v ? 'rgba(129,140,248,0.15)' : 'rgba(111,106,55,0.05)',
+                      border: person === v ? '1.5px solid rgba(129,140,248,0.6)' : '1px solid rgba(240,235,224,0.08)',
+                      background: person === v ? 'rgba(129,140,248,0.15)' : 'rgba(240,235,224,0.03)',
                       color: person === v ? 'var(--color-accent)' : 'var(--color-muted)',
                       transition: 'all 0.15s', fontFamily: 'inherit',
                     }}>
@@ -204,7 +204,7 @@ export default function AddTransactionModal({ onClose, onAdd }: Props) {
           </div>
 
           <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-            <button type="button" onClick={onClose} style={{ flex: 1, padding: 12, borderRadius: 12, background: 'rgba(111,106,55,0.07)', border: '1px solid rgba(111,106,55,0.15)', color: 'var(--color-muted)', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, padding: 12, borderRadius: 12, background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.1)', color: 'var(--color-muted)', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
               Cancel
             </button>
             <button type="submit" className="btn-primary" style={{ flex: 2, padding: 12, fontSize: 14, opacity: isValid ? 1 : 0.5 }}>

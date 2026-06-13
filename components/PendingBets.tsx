@@ -174,7 +174,7 @@ function ScoreBadge({ lk, onApply }: { lk: LookupResult; onApply?: (r: LegResult
         )}
         <span style={{
           fontSize: 13, fontWeight: 800, fontFamily: 'var(--font-mono)',
-          background: 'rgba(111,106,55,0.09)', border: '1px solid rgba(111,106,55,0.15)',
+          background: 'rgba(240,235,224,0.05)', border: '1px solid rgba(240,235,224,0.1)',
           borderRadius: 6, padding: '2px 8px',
         }}>
           {score.home}–{score.away}
@@ -226,7 +226,7 @@ const SINGLE_LEGEND_ITEMS: LegResult[] = ['win', 'loss', 'void']
 function ResultLegend({ filter }: { filter?: LegResult[] }) {
   const items = filter ? LEGEND_ITEMS.filter(i => filter.includes(i.result)) : LEGEND_ITEMS
   return (
-    <div style={{ padding: '8px 12px 4px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '5px 16px', borderTop: '1px solid rgba(111,106,55,0.09)', marginTop: 2 }}>
+    <div style={{ padding: '8px 12px 4px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '5px 16px', borderTop: '1px solid rgba(240,235,224,0.05)', marginTop: 2 }}>
       {items.map(({ result, desc }) => {
         const m = LEG_RESULT_META[result]
         return (
@@ -262,7 +262,7 @@ function SingleBetRow({ bet, onSettle, triggerCount = 0 }: {
   }, [triggerCount])
 
   return (
-    <div style={{ padding: '12px 16px', borderRadius: 12, background: 'rgba(111,106,55,0.05)', border: '1px solid rgba(111,106,55,0.12)' }}>
+    <div style={{ padding: '12px 16px', borderRadius: 12, background: 'rgba(240,235,224,0.03)', border: '1px solid rgba(240,235,224,0.07)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: 180 }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>{bet.match}</div>
@@ -293,7 +293,7 @@ function SingleBetRow({ bet, onSettle, triggerCount = 0 }: {
       {/* Lookup row */}
       <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         {lk.status === 'idle' ? (
-          <button onClick={handleLookup} style={{ fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'rgba(111,106,55,0.07)', border: '1px solid rgba(111,106,55,0.15)', borderRadius: 6, padding: '3px 10px', color: 'var(--color-muted)' }}>
+          <button onClick={handleLookup} style={{ fontSize: 11, fontWeight: 600, cursor: 'pointer', background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.1)', borderRadius: 6, padding: '3px 10px', color: 'var(--color-muted)' }}>
             🔍 Look up result
           </button>
         ) : (
@@ -370,7 +370,7 @@ function ParlayBetRow({ bet, onUpdateBet, triggerCount = 0 }: {
   }, [triggerCount])
 
   return (
-    <div style={{ borderRadius: 12, overflow: 'hidden', background: 'rgba(111,106,55,0.05)', border: '1px solid rgba(129,140,248,0.18)' }}>
+    <div style={{ borderRadius: 12, overflow: 'hidden', background: 'rgba(240,235,224,0.03)', border: '1px solid rgba(129,140,248,0.18)' }}>
 
       {/* Header */}
       <div style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', borderBottom: '1px solid rgba(129,140,248,0.12)', background: 'rgba(129,140,248,0.05)' }}>
@@ -383,7 +383,7 @@ function ParlayBetRow({ bet, onUpdateBet, triggerCount = 0 }: {
           <div style={{ fontSize: 14, fontWeight: 700 }}>{fmt(bet.stake)}</div>
         </div>
         {/* Settlement preview */}
-        <div style={{ padding: '6px 12px', borderRadius: 8, background: settlement.settledCount > 0 ? (settlement.profit > 0 ? 'rgba(52,211,153,0.1)' : settlement.profit < 0 ? 'rgba(248,113,113,0.1)' : 'rgba(111,106,55,0.07)') : 'rgba(111,106,55,0.06)', border: `1px solid ${settlement.settledCount > 0 ? (settlement.profit > 0 ? 'rgba(52,211,153,0.25)' : settlement.profit < 0 ? 'rgba(248,113,113,0.25)' : 'rgba(111,106,55,0.15)') : 'rgba(111,106,55,0.13)'}`, textAlign: 'right', minWidth: 120 }}>
+        <div style={{ padding: '6px 12px', borderRadius: 8, background: settlement.settledCount > 0 ? (settlement.profit > 0 ? 'rgba(52,211,153,0.1)' : settlement.profit < 0 ? 'rgba(248,113,113,0.1)' : 'rgba(240,235,224,0.04)') : 'rgba(240,235,224,0.04)', border: `1px solid ${settlement.settledCount > 0 ? (settlement.profit > 0 ? 'rgba(52,211,153,0.25)' : settlement.profit < 0 ? 'rgba(248,113,113,0.25)' : 'rgba(240,235,224,0.1)') : 'rgba(240,235,224,0.08)'}`, textAlign: 'right', minWidth: 120 }}>
           <div style={{ fontSize: 10, color: 'var(--color-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{settlement.settledCount}/{settlement.totalLegs} settled{dirty ? ' · unsaved' : ''}</div>
           <div style={{ fontSize: 14, fontWeight: 800, fontFamily: 'var(--font-mono)', color: settlement.settledCount === 0 ? 'var(--color-muted)' : settlement.profit > 0 ? 'var(--color-win)' : settlement.profit < 0 ? 'var(--color-loss)' : 'var(--color-muted)' }}>
             {settlement.settledCount === 0 ? `Max ${fmtPnL(maxWin)}` : fmtPnL(settlement.profit)}
@@ -412,7 +412,7 @@ function ParlayBetRow({ bet, onUpdateBet, triggerCount = 0 }: {
                   <div style={{ fontSize: 10, color: 'var(--color-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.04em' }}>{leg.league}</div>
                   <div style={{ fontSize: 12, fontWeight: 700, marginTop: 1 }}>{leg.match || '—'}</div>
                   <div style={{ fontSize: 11, color: 'var(--color-muted)', marginTop: 1 }}>
-                    <span style={{ background: 'rgba(111,106,55,0.09)', borderRadius: 3, padding: '1px 5px', marginRight: 5 }}>{leg.betType}</span>
+                    <span style={{ background: 'rgba(240,235,224,0.05)', borderRadius: 3, padding: '1px 5px', marginRight: 5 }}>{leg.betType}</span>
                     <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>{leg.prediction}</span>
                     {leg.odds > 0 && <span style={{ fontFamily: 'var(--font-mono)', marginLeft: 6, color: 'var(--color-accent)' }}>@{leg.odds.toFixed(2)}</span>}
                   </div>
@@ -422,7 +422,7 @@ function ParlayBetRow({ bet, onUpdateBet, triggerCount = 0 }: {
                     const m = LEG_RESULT_META[r]
                     const active = cur === r
                     return (
-                      <button key={r} onClick={() => handleLegResult(i, r)} title={m.label} style={{ padding: '5px 9px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', background: active ? m.bg : 'rgba(111,106,55,0.06)', border: `1px solid ${active ? m.border : 'rgba(111,106,55,0.13)'}`, color: active ? m.color : 'var(--color-muted)', transition: 'all 0.15s' }}>
+                      <button key={r} onClick={() => handleLegResult(i, r)} title={m.label} style={{ padding: '5px 9px', borderRadius: 6, fontSize: 11, fontWeight: 700, cursor: 'pointer', background: active ? m.bg : 'rgba(240,235,224,0.04)', border: `1px solid ${active ? m.border : 'rgba(240,235,224,0.08)'}`, color: active ? m.color : 'var(--color-muted)', transition: 'all 0.15s' }}>
                         {m.short}
                       </button>
                     )
@@ -443,9 +443,9 @@ function ParlayBetRow({ bet, onUpdateBet, triggerCount = 0 }: {
       {/* Save / Reset bar */}
       <div style={{ padding: '8px 12px 10px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8, borderTop: dirty ? '1px solid rgba(251,191,36,0.15)' : '1px solid transparent', transition: 'border-color 0.2s' }}>
         {dirty && (
-          <button onClick={handleReset} style={{ padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: 'rgba(111,106,55,0.07)', border: '1px solid rgba(111,106,55,0.15)', color: 'var(--color-muted)' }}>Reset</button>
+          <button onClick={handleReset} style={{ padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.1)', color: 'var(--color-muted)' }}>Reset</button>
         )}
-        <button onClick={handleSave} disabled={!dirty} style={{ padding: '7px 20px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: dirty ? 'pointer' : 'default', background: dirty ? 'rgba(129,140,248,0.2)' : 'rgba(111,106,55,0.06)', border: `1px solid ${dirty ? 'rgba(129,140,248,0.5)' : 'rgba(111,106,55,0.13)'}`, color: dirty ? 'var(--color-accent)' : 'var(--color-muted)', transition: 'all 0.2s' }}>
+        <button onClick={handleSave} disabled={!dirty} style={{ padding: '7px 20px', borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: dirty ? 'pointer' : 'default', background: dirty ? 'rgba(129,140,248,0.2)' : 'rgba(240,235,224,0.04)', border: `1px solid ${dirty ? 'rgba(129,140,248,0.5)' : 'rgba(240,235,224,0.08)'}`, color: dirty ? 'var(--color-accent)' : 'var(--color-muted)', transition: 'all 0.2s' }}>
           {dirty ? 'Save settlement' : 'No changes'}
         </button>
       </div>

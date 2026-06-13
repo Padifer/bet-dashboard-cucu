@@ -98,37 +98,37 @@ export default function BetsTable({ bets, onDelete, onEdit, onUpdateBet }: BetsT
             return (
               <button key={f} onClick={() => setFilter(f)} style={{
                 padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                background: active ? 'rgba(129,140,248,0.2)' : 'rgba(111,106,55,0.06)',
-                border: active ? '1px solid rgba(129,140,248,0.4)' : '1px solid rgba(111,106,55,0.13)',
+                background: active ? 'rgba(129,140,248,0.2)' : 'rgba(240,235,224,0.04)',
+                border: active ? '1px solid rgba(129,140,248,0.4)' : '1px solid rgba(240,235,224,0.08)',
                 color: active ? 'var(--color-accent)' : 'var(--color-muted)',
               }}>{labels[f]}</button>
             )
           })}
 
           {/* Date range */}
-          <div style={{ width: 1, height: 16, background: 'rgba(111,106,55,0.15)' }} />
+          <div style={{ width: 1, height: 16, background: 'rgba(240,235,224,0.1)' }} />
           {(['30d', '90d', 'all'] as const).map(r => {
             const labels = { '30d': '30d', '90d': '90d', all: 'All time' }
             const active = dateRange === r
             return (
               <button key={r} onClick={() => setDateRange(r)} style={{
                 padding: '5px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                background: active ? 'rgba(129,140,248,0.12)' : 'rgba(111,106,55,0.06)',
-                border: active ? '1px solid rgba(129,140,248,0.3)' : '1px solid rgba(111,106,55,0.13)',
+                background: active ? 'rgba(129,140,248,0.12)' : 'rgba(240,235,224,0.04)',
+                border: active ? '1px solid rgba(129,140,248,0.3)' : '1px solid rgba(240,235,224,0.08)',
                 color: active ? 'var(--color-accent)' : 'var(--color-muted)',
               }}>{labels[r]}</button>
             )
           })}
 
           <select value={sortBy} onChange={e => setSortBy(e.target.value as typeof sortBy)}
-            style={{ padding: '5px 10px', borderRadius: 8, fontSize: 12, background: 'rgba(111,106,55,0.06)', border: '1px solid rgba(111,106,55,0.13)', color: 'var(--color-muted)', cursor: 'pointer', outline: 'none' }}>
+            style={{ padding: '5px 10px', borderRadius: 8, fontSize: 12, background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.08)', color: 'var(--color-muted)', cursor: 'pointer', outline: 'none' }}>
             <option value="date">↓ Date</option>
             <option value="profit">↓ Profit</option>
             <option value="odds">↓ Odds</option>
           </select>
           <button onClick={() => exportCSV(bets)} title="Download CSV" style={{
             padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-            background: 'rgba(111,106,55,0.06)', border: '1px solid rgba(111,106,55,0.13)',
+            background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.08)',
             color: 'var(--color-muted)', display: 'flex', alignItems: 'center', gap: 5,
           }}>📥 CSV</button>
         </div>
@@ -142,7 +142,7 @@ export default function BetsTable({ bets, onDelete, onEdit, onUpdateBet }: BetsT
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(111,106,55,0.12)' }}>
+              <tr style={{ borderBottom: '1px solid rgba(240,235,224,0.07)' }}>
                 {['Date', 'Match', 'Competition', 'Pick', 'Odds', 'Stake', 'Picker', 'Result', 'EV', 'Profit', ''].map(h => (
                   <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 11, color: 'var(--color-muted)', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
@@ -160,8 +160,8 @@ export default function BetsTable({ bets, onDelete, onEdit, onUpdateBet }: BetsT
 
                 return (
                   <React.Fragment key={bet.id}>
-                    <tr className={`row-${bet.result}`} style={{ borderBottom: isExpanded ? 'none' : '1px solid rgba(111,106,55,0.06)', transition: 'background 0.15s' }}
-                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(111,106,55,0.05)')}
+                    <tr className={`row-${bet.result}`} style={{ borderBottom: isExpanded ? 'none' : '1px solid rgba(240,235,224,0.04)', transition: 'background 0.15s' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(240,235,224,0.03)')}
                       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                     >
                       <td style={{ padding: '12px', fontSize: 13, color: 'var(--color-muted)', whiteSpace: 'nowrap' }}>{bet.date.slice(5)}</td>
@@ -228,8 +228,8 @@ export default function BetsTable({ bets, onDelete, onEdit, onUpdateBet }: BetsT
                           }}>✏️</button>
                           <button onClick={() => handleDelete(bet.id)} style={{
                             padding: '4px 10px', borderRadius: 6, fontSize: 11, cursor: 'pointer', fontWeight: 600,
-                            background: confirmDelete === bet.id ? 'rgba(248,113,113,0.2)' : 'rgba(111,106,55,0.07)',
-                            border: confirmDelete === bet.id ? '1px solid rgba(248,113,113,0.4)' : '1px solid rgba(111,106,55,0.13)',
+                            background: confirmDelete === bet.id ? 'rgba(248,113,113,0.2)' : 'rgba(240,235,224,0.04)',
+                            border: confirmDelete === bet.id ? '1px solid rgba(248,113,113,0.4)' : '1px solid rgba(240,235,224,0.08)',
                             color: confirmDelete === bet.id ? 'var(--color-loss)' : 'var(--color-muted)',
                           }}>{confirmDelete === bet.id ? 'Sure?' : '✕'}</button>
                         </div>
@@ -238,7 +238,7 @@ export default function BetsTable({ bets, onDelete, onEdit, onUpdateBet }: BetsT
 
                     {/* ── Expanded parlay legs ── */}
                     {hasLegs && isExpanded && (
-                      <tr style={{ borderBottom: '1px solid rgba(111,106,55,0.06)' }}>
+                      <tr style={{ borderBottom: '1px solid rgba(240,235,224,0.04)' }}>
                         <td colSpan={10} style={{ padding: '0 12px 14px 36px' }}>
                           {/* Live settlement summary */}
                           {liveSettlement && (
@@ -267,13 +267,13 @@ export default function BetsTable({ bets, onDelete, onEdit, onUpdateBet }: BetsT
                               const currentResult: LegResult = leg.result ?? 'pending'
                               const meta = LEG_RESULT_META[currentResult]
                               return (
-                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 8, background: 'rgba(111,106,55,0.05)', border: `1px solid ${meta.border}` }}>
+                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 8, background: 'rgba(240,235,224,0.03)', border: `1px solid ${meta.border}` }}>
                                   {/* Leg info */}
                                   <div style={{ minWidth: 0, flex: 1 }}>
                                     <div style={{ fontSize: 10, color: 'var(--color-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 2 }}>{leg.league}</div>
                                     <div style={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{leg.match || '—'}</div>
                                     <div style={{ fontSize: 11, color: 'var(--color-muted)', marginTop: 2 }}>
-                                      <span style={{ background: 'rgba(111,106,55,0.09)', borderRadius: 4, padding: '1px 5px', marginRight: 5 }}>{leg.betType}</span>
+                                      <span style={{ background: 'rgba(240,235,224,0.05)', borderRadius: 4, padding: '1px 5px', marginRight: 5 }}>{leg.betType}</span>
                                       <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>{leg.prediction}</span>
                                     </div>
                                   </div>
@@ -296,8 +296,8 @@ export default function BetsTable({ bets, onDelete, onEdit, onUpdateBet }: BetsT
                                             title={m.label}
                                             style={{
                                               padding: '3px 7px', borderRadius: 5, fontSize: 10, fontWeight: 700, cursor: 'pointer',
-                                              background: active ? m.bg : 'rgba(111,106,55,0.06)',
-                                              border: `1px solid ${active ? m.border : 'rgba(111,106,55,0.13)'}`,
+                                              background: active ? m.bg : 'rgba(240,235,224,0.04)',
+                                              border: `1px solid ${active ? m.border : 'rgba(240,235,224,0.08)'}`,
                                               color: active ? m.color : 'var(--color-muted)',
                                               transition: 'all 0.15s',
                                             }}>

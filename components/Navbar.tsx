@@ -14,7 +14,7 @@ export default function Navbar({ onAddBet }: NavbarProps) {
     return (
       <Link href={href} style={{
         padding: '6px 14px', fontSize: 13, fontWeight: 600,
-        color: active ? '#F7F5EC' : 'rgba(247,245,236,0.55)',
+        color: active ? '#1B2B1B' : 'rgba(247,245,236,0.55)',
         background: active ? 'rgba(247,245,236,0.15)' : 'transparent',
         border: '1px solid',
         borderColor: active ? 'rgba(247,245,236,0.3)' : 'transparent',
@@ -28,8 +28,8 @@ export default function Navbar({ onAddBet }: NavbarProps) {
   return (
     <nav style={{
       position: 'sticky', top: 0, zIndex: 40,
-      background: '#6F6A37',
-      borderBottom: '1px solid rgba(0,0,0,0.12)',
+      background: '#141F14',
+      borderBottom: '1px solid rgba(240,235,224,0.06)',
       paddingTop: 'env(safe-area-inset-top)',
     }}>
       <div style={{
@@ -42,13 +42,13 @@ export default function Navbar({ onAddBet }: NavbarProps) {
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
             <span style={{
               fontSize: 17, fontWeight: 900, letterSpacing: '-0.02em',
-              color: '#F7F5EC',
+              color: '#E85C2A',
               fontStyle: 'italic',
               textTransform: 'uppercase',
             }}>Mundial</span>
             <span style={{
-              fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
-              color: 'rgba(247,245,236,0.6)',
+              fontSize: 9, fontWeight: 800, letterSpacing: '0.14em',
+              color: 'rgba(240,235,224,0.5)',
               textTransform: 'uppercase',
             }}>de los Chunguitos</span>
           </div>
@@ -60,9 +60,9 @@ export default function Navbar({ onAddBet }: NavbarProps) {
           {tab('/bank', 'Bank')}
           {tab('/fixtures', 'Fixtures')}
           <button onClick={onAddBet} style={{
-            padding: '7px 16px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
-            background: '#F7F5EC', color: '#6F6A37',
-            border: 'none', borderRadius: 6,
+            padding: '7px 16px', fontSize: 11, fontWeight: 800, cursor: 'pointer',
+            background: '#E85C2A', color: '#F0EBE0',
+            border: 'none', borderRadius: 6, letterSpacing: '0.06em', textTransform: 'uppercase',
           }}>
             + Add Bet
           </button>

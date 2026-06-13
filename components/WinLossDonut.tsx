@@ -7,7 +7,7 @@ interface WinLossDonutProps { stats: BetStats }
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ name: string; value: number; payload: { color: string } }> }) {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: '#0e0e2a', border: '1px solid rgba(111,106,55,0.18)', borderRadius: 10, padding: '8px 14px', fontSize: 13 }}>
+    <div style={{ background: '#0e0e2a', border: '1px solid rgba(240,235,224,0.12)', borderRadius: 10, padding: '8px 14px', fontSize: 13 }}>
       <span style={{ color: payload[0].payload.color, fontWeight: 700 }}>{payload[0].name}: {payload[0].value}</span>
     </div>
   )
@@ -36,12 +36,12 @@ export default function WinLossDonut({ stats }: WinLossDonutProps) {
         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <PieChart>
             <Pie
-              data={data.length ? data : [{ name: 'No data', value: 1, color: 'rgba(111,106,55,0.15)' }]}
+              data={data.length ? data : [{ name: 'No data', value: 1, color: 'rgba(240,235,224,0.1)' }]}
               cx="50%" cy="50%"
               innerRadius={60} outerRadius={88}
               paddingAngle={3} dataKey="value" strokeWidth={0}
             >
-              {(data.length ? data : [{ color: 'rgba(111,106,55,0.15)' }]).map((entry, i) => (
+              {(data.length ? data : [{ color: 'rgba(240,235,224,0.1)' }]).map((entry, i) => (
                 <Cell key={i} fill={entry.color} />
               ))}
             </Pie>

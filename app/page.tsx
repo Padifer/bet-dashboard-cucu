@@ -13,18 +13,21 @@ import MonthlyPnLChart from '@/components/MonthlyPnLChart'
 import AddBetModal from '@/components/AddBetModal'
 import BottomNav from '@/components/BottomNav'
 
-function KPIStat({ label, value, color, sub }: { label: string; value: string; color?: string; sub?: string }) {
+function BigCard({
+  label, value, sub, light = false, valueColor,
+}: { label: string; value: string; sub?: string; light?: boolean; valueColor?: string }) {
+  const bg = light ? '#F0EBE0' : '#223022'
+  const border = light ? 'rgba(27,43,27,0.1)' : 'rgba(240,235,224,0.07)'
+  const labelColor = light ? 'rgba(27,43,27,0.4)' : 'rgba(240,235,224,0.4)'
+  const defaultValueColor = light ? '#1B2B1B' : '#F0EBE0'
+  const subColor = light ? 'rgba(27,43,27,0.38)' : 'rgba(240,235,224,0.35)'
   return (
-    <div style={{ flexShrink: 0 }}>
-      <div style={{ fontSize: 10, color: 'var(--color-muted)', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 2 }}>{label}</div>
-      <div className="num" style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: color ?? 'var(--color-text)', whiteSpace: 'nowrap' }}>{value}</div>
-      {sub && <div style={{ fontSize: 10, color: 'var(--color-muted)', marginTop: 1 }}>{sub}</div>}
+    <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: '20px 22px', minHeight: 110 }}>
+      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: labelColor, marginBottom: 10 }}>{label}</div>
+      <div className="num" style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1, color: valueColor ?? defaultValueColor }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, marginTop: 8, color: subColor }}>{sub}</div>}
     </div>
   )
-}
-
-function KPIDivider() {
-  return <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(111,106,55,0.12)', flexShrink: 0, margin: '0 4px' }} />
 }
 
 export default function Dashboard() {
@@ -38,8 +41,8 @@ export default function Dashboard() {
 
   if (!loaded) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: 'var(--color-muted)', fontSize: 14 }}>Loading…</div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1B2B1B' }}>
+        <div style={{ color: 'rgba(240,235,224,0.4)', fontSize: 14 }}>Loading…</div>
       </div>
     )
   }
@@ -47,117 +50,83 @@ export default function Dashboard() {
   const hitRate = (stats.wins + stats.losses) > 0
     ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(0) : '0'
   const pendingStake = bets.filter(b => b.result === 'pending').reduce((s, b) => s + b.stake, 0)
-
   const settledBets = bets.filter(b => b.result === 'win' || b.result === 'loss')
   const avgOdds = settledBets.length > 0
-    ? (settledBets.reduce((s, b) => s + b.odds, 0) / settledBets.length).toFixed(2)
-    : null
-
-  const streakVal = stats.currentStreakType
-    ? `${stats.currentStreakType === 'win' ? '🔥' : '🥶'} ${stats.currentStreak}`
-    : '—'
-  const streakColor = stats.currentStreakType === 'win'
-    ? 'var(--color-win)'
-    : stats.currentStreakType === 'loss'
-    ? 'var(--color-loss)'
-    : 'var(--color-muted)'
-
-  const roiSign = stats.roi >= 0 ? '+' : ''
-  const roiColor = stats.roi >= 0 ? 'var(--color-win)' : 'var(--color-loss)'
+    ? (settledBets.reduce((s, b) => s + b.odds, 0) / settledBets.length).toFixed(2) : '—'
+  const streakStr = stats.currentStreakType
+    ? `${stats.currentStreakType === 'win' ? '↑' : '↓'} ${stats.currentStreak}` : '—'
+  const roiStr = `${stats.roi >= 0 ? '+' : ''}${stats.roi.toFixed(1)}%`
 
   return (
     <>
       <Navbar onAddBet={() => setShowModal(true)} />
 
-      {/* KPI sticky band */}
-      <div style={{
-        position: 'sticky',
-        top: 'calc(56px + env(safe-area-inset-top))',
-        zIndex: 39,
-        background: '#EAE7D5',
-        borderBottom: '1px solid rgba(111,106,55,0.13)',
-      }}>
-        <div style={{
-          maxWidth: 1200, margin: '0 auto',
-          padding: '10px 24px',
-          display: 'flex', alignItems: 'center', gap: 20,
-          overflowX: 'auto',
-        }}>
-          <KPIStat
-            label="Net P&L"
-            value={fmtPnL(stats.netProfit)}
-            color={stats.netProfit >= 0 ? 'var(--color-win)' : 'var(--color-loss)'}
-          />
-          <KPIStat
-            label="ROI"
-            value={`${roiSign}${stats.roi.toFixed(1)}%`}
-            color={roiColor}
-          />
-          <KPIDivider />
-          <KPIStat
-            label="Hit Rate"
-            value={`${hitRate}%`}
-            color={parseFloat(hitRate) >= 50 ? 'var(--color-win)' : 'var(--color-loss)'}
-            sub={`${stats.wins}W · ${stats.losses}L`}
-          />
-          <div className="kpi-secondary" style={{ display: 'contents' }}>
-            <KPIStat label="Streak" value={streakVal} color={streakColor} />
-            <KPIStat label="Avg Odds" value={avgOdds ?? '—'} />
-          </div>
-          {stats.pending > 0 && (
-            <div className="kpi-secondary" style={{ display: 'contents' }}>
-              <KPIDivider />
-              <KPIStat label="Open" value={`${stats.pending} bet${stats.pending !== 1 ? 's' : ''}`} color="var(--color-pending)" />
-              {pendingStake > 0 && <KPIStat label="Exposure" value={fmt(pendingStake)} color="var(--color-muted)" />}
-            </div>
-          )}
-        </div>
-      </div>
-
       <main className="page-main" style={{
-        position: 'relative', zIndex: 1,
         maxWidth: 1200, margin: '0 auto',
-        padding: '28px 24px 100px',
-        display: 'flex', flexDirection: 'column', gap: 20,
+        padding: '20px 20px 100px',
+        display: 'flex', flexDirection: 'column', gap: 14,
       }}>
 
-        {/* Pablo vs Alberto head-to-head */}
+        {/* ── Hero bento ──────────────────────────────────────────────────── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          <BigCard label="Net P&L" value={fmtPnL(stats.netProfit)} light
+            valueColor={stats.netProfit >= 0 ? '#1B6B1B' : '#B03020'}
+          />
+          <BigCard label="ROI" value={roiStr} sub={`${stats.total} bets placed`}
+            valueColor={stats.roi >= 0 ? '#6EC200' : '#E85C2A'}
+          />
+          <BigCard label="Hit Rate" value={`${hitRate}%`} sub={`${stats.wins}W · ${stats.losses}L`} light />
+          <BigCard label="Avg Odds" value={avgOdds} sub={`${stats.pending} open · ${fmt(pendingStake)} at risk`} />
+        </div>
+
+        {/* ── Pablo vs Alberto ────────────────────────────────────────────── */}
         {(stats.pabloStats.wins + stats.pabloStats.losses > 0 || stats.albertoStats.wins + stats.albertoStats.losses > 0) && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             {[
-              { name: 'Pablo', s: stats.pabloStats, icon: '👤' },
-              { name: 'Alberto', s: stats.albertoStats, icon: '👥' },
-            ].map(({ name, s, icon }) => {
-              const rColor = s.roi >= 0 ? 'var(--color-win)' : 'var(--color-loss)'
+              { name: 'Pablo', s: stats.pabloStats, light: true },
+              { name: 'Alberto', s: stats.albertoStats, light: false },
+            ].map(({ name, s, light }) => {
               const total = s.wins + s.losses
-              const winRate = total > 0 ? ((s.wins / total) * 100).toFixed(0) : '0'
+              const wr = total > 0 ? ((s.wins / total) * 100).toFixed(0) : '0'
+              const rColor = s.roi >= 0 ? '#6EC200' : '#E85C2A'
               return (
-                <div key={name} className="glass-card" style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <span style={{ fontSize: 24 }}>{icon}</span>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>{name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--color-muted)' }}>{s.wins}W / {s.losses}L · {winRate}% hit</div>
+                <div key={name} style={{
+                  background: light ? '#F0EBE0' : '#223022',
+                  border: `1px solid ${light ? 'rgba(27,43,27,0.1)' : 'rgba(240,235,224,0.07)'}`,
+                  borderRadius: 12, padding: '18px 22px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                }}>
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6, color: light ? 'rgba(27,43,27,0.4)' : 'rgba(240,235,224,0.4)' }}>{name}</div>
+                    <div className="num" style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, color: rColor }}>{s.roi >= 0 ? '+' : ''}{s.roi.toFixed(1)}%</div>
+                    <div style={{ fontSize: 11, marginTop: 5, color: light ? 'rgba(27,43,27,0.38)' : 'rgba(240,235,224,0.35)' }}>{s.wins}W / {s.losses}L · {wr}% hit</div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div className="num" style={{ fontSize: 18, fontWeight: 800, color: rColor, letterSpacing: '-0.02em' }}>
-                      {s.roi >= 0 ? '+' : ''}{s.roi.toFixed(1)}%
-                    </div>
-                    <div className="num" style={{ fontSize: 12, color: rColor, opacity: 0.8 }}>{fmtPnL(s.profit)}</div>
-                  </div>
+                  <div className="num" style={{ fontSize: 20, fontWeight: 800, color: rColor }}>{fmtPnL(s.profit)}</div>
                 </div>
               )
             })}
           </div>
         )}
 
+        {/* ── Streak / open / at risk ─────────────────────────────────────── */}
+        {(stats.currentStreakType || stats.pending > 0) && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+            <BigCard label="Streak" value={streakStr}
+              valueColor={stats.currentStreakType === 'win' ? '#6EC200' : stats.currentStreakType === 'loss' ? '#E85C2A' : undefined}
+            />
+            <BigCard label="Open Bets" value={String(stats.pending)} light />
+            <BigCard label="At Risk" value={fmt(pendingStake)} />
+          </div>
+        )}
+
         <StatsCards stats={stats} />
 
-        <div className="grid-bankroll" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 16, alignItems: 'start' }}>
+        <div className="grid-bankroll" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 14, alignItems: 'start' }}>
           <BankrollChart data={bankrollData} bankrollStart={bankrollStart} onBankrollStartChange={setBankrollStart} />
           <WinLossDonut stats={stats} />
         </div>
 
-        <div className="grid-charts-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+        <div className="grid-charts-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
           <ROIByCompetitionChart data={roiByCompetition} />
           <ROIByBetTypeChart data={roiByBetType} />
           <MonthlyPnLChart data={monthlyPnL} />
@@ -166,8 +135,8 @@ export default function Dashboard() {
 
       <button className="btn-primary hide-on-mobile" onClick={() => setShowModal(true)} style={{
         position: 'fixed', bottom: 24, right: 24, width: 52, height: 52,
-        borderRadius: '50%', fontSize: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 6px 24px rgba(111,106,55,0.3)', zIndex: 30,
+        borderRadius: '50%', fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: '0 6px 24px rgba(232,92,42,0.45)', zIndex: 30,
       }} aria-label="Add bet">+</button>
 
       {showModal && <AddBetModal onClose={() => setShowModal(false)} onAdd={addBet} />}

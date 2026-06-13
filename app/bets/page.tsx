@@ -66,7 +66,7 @@ function BetCard({ bet, onEdit, onDelete }: { bet: Bet; onEdit: (b: Bet) => void
       </div>
 
       {/* Prediction row */}
-      <div style={{ fontSize: 13, color: 'var(--color-muted)', padding: '8px 12px', background: 'rgba(111,106,55,0.05)', borderRadius: 8 }}>
+      <div style={{ fontSize: 13, color: 'var(--color-muted)', padding: '8px 12px', background: 'rgba(240,235,224,0.03)', borderRadius: 8 }}>
         <span style={{ color: 'var(--color-text)', fontWeight: 600 }}>{bet.prediction}</span>
         <span style={{ marginLeft: 8, opacity: 0.6 }}>· {bet.betType}</span>
       </div>
@@ -94,7 +94,7 @@ function BetCard({ bet, onEdit, onDelete }: { bet: Bet; onEdit: (b: Bet) => void
       </div>
 
       {/* Footer: picker + actions */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 6, borderTop: '1px solid rgba(111,106,55,0.09)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 6, borderTop: '1px solid rgba(240,235,224,0.05)' }}>
         <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>
           {bet.picker ? PICKER_LABEL[bet.picker] : '—'}
           {bet.fundedBy && bet.fundedBy !== 'bank' && (
@@ -109,8 +109,8 @@ function BetCard({ bet, onEdit, onDelete }: { bet: Bet; onEdit: (b: Bet) => void
           }}>Edit</button>
           <button onClick={handleDelete} style={{
             padding: '5px 12px', borderRadius: 7, fontSize: 12, cursor: 'pointer', fontWeight: 600,
-            background: confirmDelete ? 'rgba(248,113,113,0.2)' : 'rgba(111,106,55,0.07)',
-            border: confirmDelete ? '1px solid rgba(248,113,113,0.4)' : '1px solid rgba(111,106,55,0.13)',
+            background: confirmDelete ? 'rgba(248,113,113,0.2)' : 'rgba(240,235,224,0.04)',
+            border: confirmDelete ? '1px solid rgba(248,113,113,0.4)' : '1px solid rgba(240,235,224,0.08)',
             color: confirmDelete ? 'var(--color-loss)' : 'var(--color-muted)',
           }}>{confirmDelete ? 'Sure?' : '✕'}</button>
         </div>
@@ -169,9 +169,9 @@ export default function BetsPage() {
         position: 'sticky',
         top: 'calc(56px + env(safe-area-inset-top))',
         zIndex: 39,
-        background: 'rgba(247,245,236,0.97)',
+        background: 'rgba(27,43,27,0.97)',
         backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(111,106,55,0.12)',
+        borderBottom: '1px solid rgba(240,235,224,0.07)',
       }}>
         <div style={{
           maxWidth: 700, margin: '0 auto',
@@ -183,8 +183,8 @@ export default function BetsPage() {
             return (
               <button key={key} className="pill-btn" onClick={() => setFilter(key)} style={{
                 padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
-                background: active ? 'rgba(129,140,248,0.18)' : 'rgba(111,106,55,0.06)',
-                border: active ? '1px solid rgba(129,140,248,0.4)' : '1px solid rgba(111,106,55,0.13)',
+                background: active ? 'rgba(129,140,248,0.18)' : 'rgba(240,235,224,0.04)',
+                border: active ? '1px solid rgba(129,140,248,0.4)' : '1px solid rgba(240,235,224,0.08)',
                 color: active ? 'var(--color-accent)' : 'var(--color-muted)',
               }}>
                 {label} <span style={{ opacity: 0.7, fontSize: 11 }}>{count}</span>
@@ -192,22 +192,22 @@ export default function BetsPage() {
             )
           })}
 
-          <div style={{ width: 1, height: 16, background: 'rgba(111,106,55,0.15)', flexShrink: 0 }} />
+          <div style={{ width: 1, height: 16, background: 'rgba(240,235,224,0.1)', flexShrink: 0 }} />
 
           {(['30d', '90d', 'all'] as const).map(r => {
             const active = dateRange === r
             return (
               <button key={r} className="pill-btn" onClick={() => setDateRange(r)} style={{
                 padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0,
-                background: active ? 'rgba(129,140,248,0.12)' : 'rgba(111,106,55,0.06)',
-                border: active ? '1px solid rgba(129,140,248,0.3)' : '1px solid rgba(111,106,55,0.13)',
+                background: active ? 'rgba(129,140,248,0.12)' : 'rgba(240,235,224,0.04)',
+                border: active ? '1px solid rgba(129,140,248,0.3)' : '1px solid rgba(240,235,224,0.08)',
                 color: active ? 'var(--color-accent)' : 'var(--color-muted)',
               }}>{r === 'all' ? 'All time' : r}</button>
             )
           })}
 
           <select value={sortBy} onChange={e => setSortBy(e.target.value as SortBy)}
-            style={{ marginLeft: 'auto', padding: '6px 10px', borderRadius: 8, fontSize: 12, background: 'rgba(111,106,55,0.06)', border: '1px solid rgba(111,106,55,0.13)', color: 'var(--color-muted)', cursor: 'pointer', outline: 'none', flexShrink: 0 }}>
+            style={{ marginLeft: 'auto', padding: '6px 10px', borderRadius: 8, fontSize: 12, background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.08)', color: 'var(--color-muted)', cursor: 'pointer', outline: 'none', flexShrink: 0 }}>
             <option value="date">↓ Date</option>
             <option value="profit">↓ Profit</option>
             <option value="odds">↓ Odds</option>
