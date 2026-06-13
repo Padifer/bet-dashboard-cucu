@@ -186,7 +186,7 @@ export default function BetsPage() {
 
       {/* Stats hero */}
       <div style={{ maxWidth: 700, margin: '0 auto', padding: '16px 16px 0' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+        <div className="grid-mini-4">
           <MiniCard label="Open" value={stats.pending} sub={`$${pendingStake.toFixed(0)} at risk`} light />
           <MiniCard label="Won" value={stats.wins} valueColor="#6EC200" />
           <MiniCard label="Lost" value={stats.losses} valueColor="#E85C2A" light />

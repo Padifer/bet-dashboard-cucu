@@ -68,7 +68,7 @@ export default function Dashboard() {
       }}>
 
         {/* ── Hero bento ──────────────────────────────────────────────────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+        <div className="grid-hero">
           <BigCard label="Net P&L" value={fmtPnL(stats.netProfit)} light
             valueColor={stats.netProfit >= 0 ? '#1B6B1B' : '#B03020'}
           />

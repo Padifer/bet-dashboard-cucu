@@ -152,16 +152,47 @@ body {
   align-items: start;
 }
 
+/* ── Responsive grid helpers ────────────────────────────────────────────────── */
+/* Hero 4-up: Net P&L | ROI | Hit Rate | Avg Odds */
+.grid-hero {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+/* 4-up mini stat strip (bets page) */
+.grid-mini-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+/* Bank top row: Bank Balance (wide) | Pablo | Alberto */
+.grid-bank-hero {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 12px;
+}
+
 /* ── Mobile responsive ──────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .grid-bank { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
+  /* No horizontal scroll anywhere */
+  body, html { overflow-x: hidden; }
+
   .grid-bank           { grid-template-columns: 1fr; }
   .grid-charts-3       { grid-template-columns: 1fr !important; }
   .grid-charts-2       { grid-template-columns: 1fr !important; }
   .grid-headtohead     { grid-template-columns: 1fr !important; }
   .grid-bankroll       { grid-template-columns: 1fr !important; }
+
+  /* 4-col grids → 2×2 on mobile */
+  .grid-hero   { grid-template-columns: repeat(2, 1fr); }
+  .grid-mini-4 { grid-template-columns: repeat(2, 1fr); }
+
+  /* Bank hero: Bank Balance full-width, Pablo + Alberto side by side */
+  .grid-bank-hero { grid-template-columns: 1fr 1fr; }
+  .grid-bank-hero > :first-child { grid-column: 1 / -1; }
 }
 
 body {

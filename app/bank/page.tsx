@@ -80,7 +80,7 @@ export default function BankPage() {
       }}>
 
         {/* ── Row 1: bento balance grid (same pattern as dashboard) ──────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 12 }}>
+        <div className="grid-bank-hero">
           <BigCard
             label="Bank Balance"
             value={loaded ? fmt(adjustedBankTotal) : '…'}
