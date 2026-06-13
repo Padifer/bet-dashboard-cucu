@@ -13,45 +13,33 @@ function computeBalances(bets: Bet[], transactions: BankTransaction[]) {
   const debts   = transactions.filter(t => t.type === 'debt')
 
   const sign = (t: BankTransaction) => t.type === 'deposit' ? 1 : -1
-  const pabloBank  = bankTxs.filter(t => t.person === 'Pablo').reduce((s, t) => s + sign(t) * t.amount, 0)
+  const pabloBank   = bankTxs.filter(t => t.person === 'Pablo').reduce((s, t) => s + sign(t) * t.amount, 0)
   const albertoBank = bankTxs.filter(t => t.person === 'Alberto').reduce((s, t) => s + sign(t) * t.amount, 0)
 
   const settledBets = bets.filter(b => b.result !== 'pending' && b.result !== 'void')
-  // Exclude personally-funded losses from betShare: the stake for those
-  // is already captured in frontedForPablo/frontedForAlberto below.
-  // Wins are included (stake came back from bookie, only profit is shared).
-  const betsForPnL = settledBets.filter(b =>
+  const betsForPnL  = settledBets.filter(b =>
     !(b.fundedBy === 'alberto' && b.result === 'loss') &&
-    !(b.fundedBy === 'pablo'  && b.result === 'loss')
+    !(b.fundedBy === 'pablo'   && b.result === 'loss')
   )
   const totalBetPnL = betsForPnL.reduce((s, b) => s + b.profit, 0)
-  const betShare = totalBetPnL / 2
+  const betShare    = totalBetPnL / 2
 
   const pendingStake = bets.filter(b => b.result === 'pending').reduce((s, b) => s + b.stake, 0)
 
-  // Include pending bets (not void) in the fronted stake calculation:
-  // cash for pending bets has already left the funder's pocket.
-  // Void bets return the stake to the funder, so the obligation cancels.
-  // Wins are excluded: the bookie returned the stake, so no fronting remains.
   const inFlightBets = bets.filter(b => b.result !== 'void')
-  const albertoFrontedForPablo = inFlightBets
-    .filter(b => b.fundedBy === 'alberto' && b.result !== 'win')
-    .reduce((s, b) => s + b.stake / 2, 0)
-  const pabloFrontedForAlberto = inFlightBets
-    .filter(b => b.fundedBy === 'pablo' && b.result !== 'win')
-    .reduce((s, b) => s + b.stake / 2, 0)
+  const albertoFrontedForPablo  = inFlightBets.filter(b => b.fundedBy === 'alberto' && b.result !== 'win').reduce((s, b) => s + b.stake / 2, 0)
+  const pabloFrontedForAlberto  = inFlightBets.filter(b => b.fundedBy === 'pablo'   && b.result !== 'win').reduce((s, b) => s + b.stake / 2, 0)
 
-  // Explicit debts (inter-person advances)
-  const pabloOwes  = debts.filter(t => t.person === 'Pablo').reduce((s, t) => s + t.amount, 0)
+  const pabloOwes   = debts.filter(t => t.person === 'Pablo').reduce((s, t) => s + t.amount, 0)
   const albertoOwes = debts.filter(t => t.person === 'Alberto').reduce((s, t) => s + t.amount, 0)
 
-  const pabloNet  = pabloBank  + betShare - pabloOwes  + albertoOwes - albertoFrontedForPablo + pabloFrontedForAlberto
-  const albertoNet = albertoBank + betShare - albertoOwes + pabloOwes  + albertoFrontedForPablo - pabloFrontedForAlberto
+  const pabloNet   = pabloBank   + betShare - pabloOwes   + albertoOwes - albertoFrontedForPablo + pabloFrontedForAlberto
+  const albertoNet = albertoBank + betShare - albertoOwes + pabloOwes   + albertoFrontedForPablo - pabloFrontedForAlberto
 
-  const diff = pabloNet - albertoNet
+  const diff       = pabloNet - albertoNet
   const settlement = Math.abs(diff) / 2
-  const debtor   = Math.abs(diff) > 0.005 ? (diff > 0 ? 'Alberto' : 'Pablo')  : null
-  const creditor = Math.abs(diff) > 0.005 ? (diff > 0 ? 'Pablo'  : 'Alberto') : null
+  const debtor     = Math.abs(diff) > 0.005 ? (diff > 0 ? 'Alberto' : 'Pablo')  : null
+  const creditor   = Math.abs(diff) > 0.005 ? (diff > 0 ? 'Pablo'  : 'Alberto') : null
 
   return {
     pabloBank, albertoBank, betShare, totalBetPnL, pendingStake,
@@ -61,14 +49,27 @@ function computeBalances(bets: Bet[], transactions: BankTransaction[]) {
   }
 }
 
-function Line({ label, value, color, bold }: { label: string; value: number | null; color?: string; bold?: boolean }) {
-  const isZero = value === 0
-  const c = color ?? (isZero || value === null ? 'var(--color-muted)' : value > 0 ? 'var(--color-win)' : 'var(--color-loss)')
+function LineItem({ label, value, accent }: { label: string; value: number; accent?: string }) {
+  if (value === 0) return null
+  const color = accent ?? (value > 0 ? '#6EC200' : '#E85C2A')
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '4px 0', borderBottom: '1px solid rgba(240,235,224,0.04)' }}>
-      <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>{label}</span>
-      <span style={{ fontSize: bold ? 14 : 13, fontWeight: bold ? 700 : 500, color: c, fontVariantNumeric: 'tabular-nums' }}>
-        {value === null || isZero ? '—' : (value > 0 ? '+' : '') + fmt(value)}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '3px 0' }}>
+      <span style={{ fontSize: 11, color: 'rgba(240,235,224,0.4)' }}>{label}</span>
+      <span className="num" style={{ fontSize: 12, fontWeight: 700, color }}>
+        {value > 0 ? '+' : ''}{fmt(value)}
+      </span>
+    </div>
+  )
+}
+
+function LineItemLight({ label, value, accent }: { label: string; value: number; accent?: string }) {
+  if (value === 0) return null
+  const color = accent ?? (value > 0 ? '#1B6B1B' : '#B03020')
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '3px 0' }}>
+      <span style={{ fontSize: 11, color: 'rgba(27,43,27,0.45)' }}>{label}</span>
+      <span className="num" style={{ fontSize: 12, fontWeight: 700, color }}>
+        {value > 0 ? '+' : ''}{fmt(value)}
       </span>
     </div>
   )
@@ -84,111 +85,106 @@ export default function BalancesWidget({ bets, transactions }: Props) {
 
   const people = [
     {
-      name: 'Pablo',  icon: '👤', accent: '#818cf8',
-      bankVal: pabloBank,  owes: pabloOwes,  isOwed: albertoOwes,
-      frontedByOther: albertoFrontedForPablo,
-      frontedForOther: pabloFrontedForAlberto,
-      otherName: 'Alberto',
-      net: pabloNet,
+      name: 'Pablo', light: true,
+      bankVal: pabloBank, owes: pabloOwes, isOwed: albertoOwes,
+      frontedByOther: albertoFrontedForPablo, frontedForOther: pabloFrontedForAlberto,
+      otherName: 'Alberto', net: pabloNet,
     },
     {
-      name: 'Alberto', icon: '👥', accent: '#a78bfa',
+      name: 'Alberto', light: false,
       bankVal: albertoBank, owes: albertoOwes, isOwed: pabloOwes,
-      frontedByOther: pabloFrontedForAlberto,
-      frontedForOther: albertoFrontedForPablo,
-      otherName: 'Pablo',
-      net: albertoNet,
+      frontedByOther: pabloFrontedForAlberto, frontedForOther: albertoFrontedForPablo,
+      otherName: 'Pablo', net: albertoNet,
     },
   ]
 
   return (
-    <div className="glass-card fade-up" style={{ padding: 0, overflow: 'hidden' }}>
-      {/* Header */}
-      <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(240,235,224,0.07)', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ fontSize: 20 }}>💰</span>
-        <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.01em' }}>Balances & Settlement</span>
-        <span style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--color-muted)' }}>Bets split 50/50</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+
+      {/* Section label */}
+      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(240,235,224,0.35)', paddingLeft: 2 }}>
+        Settlement
       </div>
 
-      {/* Two-column ledger */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-        {people.map((p, idx) => (
-          <div key={p.name} style={{
-            padding: '16px 20px',
-            borderRight: idx === 0 ? '1px solid rgba(240,235,224,0.07)' : undefined,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <span style={{ fontSize: 18 }}>{p.icon}</span>
-              <span style={{ fontSize: 14, fontWeight: 700, color: p.accent }}>{p.name}</span>
-            </div>
+      {/* Person cards — same alternating pattern as dashboard */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {people.map(p => {
+          const bg     = p.light ? '#F0EBE0' : '#223022'
+          const border = p.light ? 'rgba(27,43,27,0.1)' : 'rgba(240,235,224,0.07)'
+          const label  = p.light ? 'rgba(27,43,27,0.4)' : 'rgba(240,235,224,0.4)'
+          const sub    = p.light ? 'rgba(27,43,27,0.35)' : 'rgba(240,235,224,0.33)'
+          const netColor = p.net > 0.005
+            ? (p.light ? '#1B6B1B' : '#6EC200')
+            : p.net < -0.005
+              ? (p.light ? '#B03020' : '#E85C2A')
+              : (p.light ? 'rgba(27,43,27,0.4)' : 'rgba(240,235,224,0.4)')
 
-            <Line label="Bank (net contributed)" value={p.bankVal} />
-            <Line label={`Bets P&L (50% of ${totalBetPnL >= 0 ? '+' : ''}${fmt(totalBetPnL)})`} value={betShare} />
-            {p.frontedByOther > 0 && (
-              <Line
-                label={`Stake fronted by ${p.otherName}`}
-                value={-p.frontedByOther}
-                color="#fb923c"
-              />
-            )}
-            {p.frontedForOther > 0 && (
-              <Line
-                label={`Stake fronted for ${p.otherName}`}
-                value={p.frontedForOther}
-                color="#fb923c"
-              />
-            )}
-            {p.owes   > 0 && <Line label={`Owes ${p.otherName}`}          value={-p.owes}  color="#fbbf24" />}
-            {p.isOwed > 0 && <Line label={`${p.otherName} owes`}          value={p.isOwed} color="#fbbf24" />}
+          return (
+            <div key={p.name} style={{ background: bg, border: `1px solid ${border}`, borderRadius: 12, padding: '18px 20px' }}>
+              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: label, marginBottom: 10 }}>
+                {p.name}
+              </div>
+              <div className="num" style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1, color: netColor }}>
+                {Math.abs(p.net) < 0.005 ? '—' : (p.net > 0 ? '+' : '') + fmt(p.net)}
+              </div>
+              <div style={{ fontSize: 10, marginTop: 4, color: sub }}>net position · if settled now</div>
 
-            {/* Net */}
-            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(240,235,224,0.1)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <div>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Net position</span>
-                  <div style={{ fontSize: 10, color: 'var(--color-muted)', opacity: 0.5, marginTop: 1 }}>if settled today</div>
-                </div>
-                <span style={{
-                  fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums',
-                  color: p.net > 0.005 ? 'var(--color-win)' : p.net < -0.005 ? 'var(--color-loss)' : 'var(--color-muted)',
-                }}>
-                  {Math.abs(p.net) < 0.005 ? '—' : (p.net > 0 ? '+' : '') + fmt(p.net)}
-                </span>
+              {/* Breakdown */}
+              <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${p.light ? 'rgba(27,43,27,0.08)' : 'rgba(240,235,224,0.07)'}` }}>
+                {p.light ? (
+                  <>
+                    <LineItemLight label="Bank contributed" value={p.bankVal} />
+                    <LineItemLight label={`Bets P&L share (50%)`} value={betShare} />
+                    {p.frontedByOther  > 0 && <LineItemLight label={`Fronted by ${p.otherName}`}   value={-p.frontedByOther}  accent="#C06010" />}
+                    {p.frontedForOther > 0 && <LineItemLight label={`Fronted for ${p.otherName}`}  value={p.frontedForOther}  accent="#1B6B1B" />}
+                    {p.owes   > 0 && <LineItemLight label={`Owes ${p.otherName}`}        value={-p.owes}   accent="#B03020" />}
+                    {p.isOwed > 0 && <LineItemLight label={`${p.otherName} owes`}        value={p.isOwed}  accent="#1B6B1B" />}
+                  </>
+                ) : (
+                  <>
+                    <LineItem label="Bank contributed" value={p.bankVal} />
+                    <LineItem label={`Bets P&L share (50%)`} value={betShare} />
+                    {p.frontedByOther  > 0 && <LineItem label={`Fronted by ${p.otherName}`}   value={-p.frontedByOther}  accent="#E85C2A" />}
+                    {p.frontedForOther > 0 && <LineItem label={`Fronted for ${p.otherName}`}  value={p.frontedForOther}  accent="#6EC200" />}
+                    {p.owes   > 0 && <LineItem label={`Owes ${p.otherName}`}        value={-p.owes}   accent="#E85C2A" />}
+                    {p.isOwed > 0 && <LineItem label={`${p.otherName} owes`}        value={p.isOwed}  accent="#6EC200" />}
+                  </>
+                )}
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Settlement banner */}
       <div style={{
-        padding: '18px 24px',
-        borderTop: '1px solid rgba(240,235,224,0.07)',
-        background: !debtor ? 'rgba(52,211,153,0.04)' : 'rgba(251,191,36,0.04)',
-        display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+        background: !debtor ? 'rgba(110,194,0,0.08)' : 'rgba(245,200,66,0.07)',
+        border: `1px solid ${!debtor ? 'rgba(110,194,0,0.2)' : 'rgba(245,200,66,0.2)'}`,
+        borderRadius: 12, padding: '14px 20px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
       }}>
-        <span style={{ fontSize: 18 }}>{!debtor ? '✅' : '🤝'}</span>
         {!debtor ? (
-          <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-win)' }}>All square — no outstanding debts</span>
+          <>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(110,194,0,0.7)', marginBottom: 3 }}>All square</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#6EC200' }}>No outstanding debts</div>
+            </div>
+            <div style={{ fontSize: 24 }}>✓</div>
+          </>
         ) : (
           <>
-            <div style={{ flex: 1 }}>
-              <span style={{ fontSize: 16, fontWeight: 800, color: '#fbbf24' }}>
-                {debtor} owes {creditor}
-              </span>
-              <span style={{ fontSize: 11, color: 'var(--color-muted)', marginLeft: 8 }}>to settle the difference</span>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(245,200,66,0.6)', marginBottom: 3 }}>To settle</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#F5C842' }}>{debtor} → {creditor}</div>
             </div>
-            <span style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.02em', color: '#fbbf24', fontVariantNumeric: 'tabular-nums' }}>
-              {fmt(settlement)}
-            </span>
+            <div className="num" style={{ fontSize: 32, fontWeight: 900, letterSpacing: '-0.03em', color: '#F5C842' }}>{fmt(settlement)}</div>
           </>
         )}
       </div>
 
-      {/* Pending footnote */}
       {pendingStake > 0 && (
-        <div style={{ padding: '8px 20px', borderTop: '1px solid rgba(240,235,224,0.04)', fontSize: 11, color: 'var(--color-muted)', opacity: 0.6 }}>
-          {fmt(pendingStake)} in pending stakes included — settlement will update when bets resolve.
+        <div style={{ fontSize: 11, color: 'rgba(240,235,224,0.3)', paddingLeft: 2 }}>
+          {fmt(pendingStake)} in open stakes — settlement updates when bets resolve.
         </div>
       )}
     </div>

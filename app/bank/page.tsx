@@ -128,6 +128,7 @@ export default function BankPage() {
               onAdd={addTransaction}
               onDelete={deleteTransaction}
               onDeleteGroup={deleteGroup}
+              hideHeader
             />
             <BalancesWidget bets={bets} transactions={transactions} />
           </>

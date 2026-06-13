@@ -227,6 +227,13 @@ export default function FixturesPage() {
   const [showModal, setShowModal] = useState(false)
   const [prefilledBet, setPrefilledBet] = useState<{ match: string; odds: string } | null>(null)
 
+  // Auto-switch to Upcoming when Today is empty (Bangkok UTC+7 means late-UTC matches show as tomorrow)
+  useEffect(() => {
+    if (matches.length > 0 && !matches.some(m => isToday(m.utcDate))) {
+      setTab('upcoming')
+    }
+  }, [matches])
+
   useEffect(() => {
     async function load() {
       try {
