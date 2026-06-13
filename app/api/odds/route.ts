@@ -82,7 +82,7 @@ async function fetchSport(key: string, apiKey: string): Promise<MatchOdds[]> {
   }
 }
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600 // 1h — enough for odds that change slowly
 
 export async function GET(): Promise<NextResponse<OddsResponse>> {
   const apiKey = process.env.ODDS_API_KEY

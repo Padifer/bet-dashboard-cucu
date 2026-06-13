@@ -34,15 +34,49 @@ function normalize(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '')
 }
 
+// Maps normalized variants → canonical key so football-data.org and Odds API names resolve to the same value
+const ALIASES: Record<string, string> = {
+  // USA
+  unitedstates: 'usa', unitedstatesofamerica: 'usa', usa: 'usa',
+  // South Korea
+  korearepublic: 'southkorea', southkorea: 'southkorea', korea: 'southkorea',
+  // Iran
+  iriran: 'iran', iran: 'iran',
+  // Ivory Coast
+  ivorycoast: 'ivorycoast', cotedivoire: 'ivorycoast',
+  // Czechia
+  czechia: 'czechia', czechrepublic: 'czechia',
+  // Trinidad & Tobago
+  trinidadandtobago: 'trinidadtobago', trinidadtobago: 'trinidadtobago',
+  // Bosnia
+  bosniaandherzegovina: 'bosnia', bosniaherzegovina: 'bosnia', bosnia: 'bosnia',
+  // North Macedonia
+  northmacedonia: 'northmacedonia', macedonia: 'northmacedonia', republicofnorthmacedonia: 'northmacedonia',
+  // Republic of Ireland
+  republicofireland: 'ireland', ireland: 'ireland',
+  // Congo DR / DRC
+  democraticrepublicofthecongo: 'drcongo', drcongo: 'drcongo', congodr: 'drcongo',
+}
+
+function canonical(name: string): string {
+  const n = normalize(name)
+  return ALIASES[n] ?? n
+}
+
 function mergeOdds(matches: UpcomingMatch[], odds: MatchOdds[]): EnrichedMatch[] {
   return matches.map(m => {
-    const hn = normalize(m.homeTeam)
-    const an = normalize(m.awayTeam)
-    const found = odds.find(o => {
-      const oh = normalize(o.homeTeam)
-      const oa = normalize(o.awayTeam)
-      return (oh.includes(hn) || hn.includes(oh)) && (oa.includes(an) || an.includes(oa))
-    })
+    const ch = canonical(m.homeTeam)
+    const ca = canonical(m.awayTeam)
+    // 1st pass: exact canonical match (handles USA vs "United States" etc)
+    let found = odds.find(o => canonical(o.homeTeam) === ch && canonical(o.awayTeam) === ca)
+    if (!found) {
+      // 2nd pass: substring inclusion as fallback for unusual names
+      found = odds.find(o => {
+        const oh = canonical(o.homeTeam)
+        const oa = canonical(o.awayTeam)
+        return (oh.includes(ch) || ch.includes(oh)) && (oa.includes(ca) || ca.includes(oa))
+      })
+    }
     return { ...m, odds: found ?? null }
   })
 }

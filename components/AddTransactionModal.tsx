@@ -6,6 +6,7 @@ import { fmt } from '@/utils/currency'
 interface Props {
   onClose: () => void
   onAdd: (tx: Omit<BankTransaction, 'id'>) => void
+  defaultType?: 'deposit' | 'withdrawal'
 }
 
 const labelStyle: React.CSSProperties = {
@@ -26,8 +27,8 @@ function newGroupId() {
 type PersonOption = TransactionPerson | 'Both'
 type TabType = 'deposit' | 'withdrawal' | 'debt'
 
-export default function AddTransactionModal({ onClose, onAdd }: Props) {
-  const [tab, setTab] = useState<TabType>('deposit')
+export default function AddTransactionModal({ onClose, onAdd, defaultType }: Props) {
+  const [tab, setTab] = useState<TabType>(defaultType ?? 'deposit')
   const [person, setPerson] = useState<PersonOption>('Both')
   const [debtor, setDebtor] = useState<TransactionPerson>('Pablo')
   const [amount, setAmount] = useState('')

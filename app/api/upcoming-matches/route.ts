@@ -83,7 +83,7 @@ async function fetchCompetition(
   }
 }
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 1800 // 30min — scores update during group stage
 
 export async function GET(): Promise<NextResponse<MatchesResponse>> {
   const key = process.env.FOOTBALL_DATA_API_KEY
