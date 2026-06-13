@@ -1,10 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#0f0f1a"/>
-  <circle cx="256" cy="220" r="130" fill="none" stroke="#34d399" stroke-width="22"/>
-  <circle cx="256" cy="220" r="44" fill="#34d399"/>
-  <line x1="256" y1="90" x2="256" y2="350" stroke="#34d399" stroke-width="14" opacity="0.25"/>
-  <line x1="126" y1="220" x2="386" y2="220" stroke="#34d399" stroke-width="14" opacity="0.25"/>
-  <line x1="164" y1="118" x2="348" y2="322" stroke="#34d399" stroke-width="14" opacity="0.25"/>
-  <line x1="348" y1="118" x2="164" y2="322" stroke="#34d399" stroke-width="14" opacity="0.25"/>
-  <rect x="160" y="390" width="192" height="28" rx="14" fill="#818cf8" opacity="0.7"/>
+  <!-- Background: dashboard dark green with rounded corners -->
+  <rect width="512" height="512" rx="112" fill="#223022"/>
+
+  <!-- Soccer ball: cream base circle -->
+  <circle cx="256" cy="256" r="160" fill="#F0EBE0"/>
+
+  <!-- Classic soccer ball black patches -->
+  <!-- Central pentagon (top) -->
+  <polygon points="256,120 292,148 278,190 234,190 220,148" fill="#1B2B1B"/>
+  <!-- Pentagon bottom-left -->
+  <polygon points="136,208 172,196 186,238 158,268 120,254" fill="#1B2B1B"/>
+  <!-- Pentagon bottom-right -->
+  <polygon points="376,208 340,196 326,238 354,268 392,254" fill="#1B2B1B"/>
+  <!-- Pentagon bottom-center-left -->
+  <polygon points="190,344 198,300 240,296 258,334 232,362" fill="#1B2B1B"/>
+  <!-- Pentagon bottom-center-right -->
+  <polygon points="322,344 314,300 272,296 254,334 280,362" fill="#1B2B1B"/>
+
+  <!-- Ball outline -->
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#1B2B1B" stroke-width="6" opacity="0.25"/>
 </svg>
