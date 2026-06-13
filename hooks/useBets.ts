@@ -178,9 +178,20 @@ export function useBets() {
     localStorage.setItem(BANKROLL_KEY, String(amount))
   }
 
-  const addBet    = async (bet: Omit<Bet, 'id'>)             => { await supabase.from('bets_cucu').insert(betToRow(bet)) }
-  const deleteBet = async (id: string)                        => { await supabase.from('bets_cucu').delete().eq('id', id) }
-  const updateBet = async (id: string, updates: Partial<Bet>) => { await supabase.from('bets_cucu').update(betToRow(updates)).eq('id', id) }
+  const addBet = async (bet: Omit<Bet, 'id'>) => {
+    const { data } = await supabase.from('bets_cucu').insert(betToRow(bet)).select().single()
+    if (data) setBets(prev => [...prev, rowToBet(data)])
+  }
+
+  const deleteBet = async (id: string) => {
+    setBets(prev => prev.filter(b => b.id !== id))
+    await supabase.from('bets_cucu').delete().eq('id', id)
+  }
+
+  const updateBet = async (id: string, updates: Partial<Bet>) => {
+    setBets(prev => prev.map(b => b.id === id ? { ...b, ...updates } : b))
+    await supabase.from('bets_cucu').update(betToRow(updates)).eq('id', id)
+  }
 
   const settleBet = async (id: string, result: 'win' | 'loss' | 'void') => {
     const bet = bets.find(b => b.id === id)

@@ -57,14 +57,17 @@ export function useBankAccount() {
   }, [channelName])
 
   const addTransaction = async (tx: Omit<BankTransaction, 'id'>) => {
-    await supabase.from('bank_transactions_cucu').insert(txToRow(tx))
+    const { data } = await supabase.from('bank_transactions_cucu').insert(txToRow(tx)).select().single()
+    if (data) setTransactions(prev => [...prev, rowToTx(data)])
   }
 
   const deleteTransaction = async (id: string) => {
+    setTransactions(prev => prev.filter(t => t.id !== id))
     await supabase.from('bank_transactions_cucu').delete().eq('id', id)
   }
 
   const deleteGroup = async (groupId: string) => {
+    setTransactions(prev => prev.filter(t => t.groupId !== groupId))
     await supabase.from('bank_transactions_cucu').delete().eq('group_id', groupId)
   }
 
