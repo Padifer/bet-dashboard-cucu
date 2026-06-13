@@ -92,9 +92,9 @@ export async function GET(): Promise<NextResponse<MatchesResponse>> {
   }
 
   const today = new Date()
-  const nextWeek = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000)
+  const endOfTournament = new Date('2026-07-20')
   const dateFrom = today.toISOString().slice(0, 10)
-  const dateTo = nextWeek.toISOString().slice(0, 10)
+  const dateTo = endOfTournament.toISOString().slice(0, 10)
 
   const settled = await Promise.allSettled(
     COMPETITIONS.map(c => fetchCompetition(key, c, dateFrom, dateTo)),

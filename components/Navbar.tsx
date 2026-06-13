@@ -37,11 +37,21 @@ export default function Navbar({ onAddBet }: NavbarProps) {
         padding: '0 24px', height: 54,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-          <span style={{ fontSize: 16 }}>🏆</span>
-          <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em', color: '#E2E8F0' }}>
-            WC<span style={{ color: '#F5A623' }}>26</span>
-          </span>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <span style={{ fontSize: 22, lineHeight: 1 }}>⚽</span>
+          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
+            <span style={{
+              fontSize: 16, fontWeight: 900, letterSpacing: '-0.02em',
+              color: '#F5A623',
+              fontStyle: 'italic',
+              textTransform: 'uppercase',
+            }}>Mundial</span>
+            <span style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
+              color: 'rgba(255,255,255,0.5)',
+              textTransform: 'uppercase',
+            }}>de los Chunguitos</span>
+          </div>
         </Link>
 
         <div className="nav-tabs-top" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

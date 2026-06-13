@@ -24,13 +24,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "WC26 Bets",
-  description: "World Cup 2026 betting dashboard",
+  title: "⚽ Mundial de los Chunguitos",
+  description: "World Cup 2026 — Los Chunguitos betting dashboard",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "WC26 Bets",
+    title: "Los Chunguitos",
   },
   icons: {
     icon: "/icon.svg",
