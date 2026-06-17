@@ -12,6 +12,7 @@ import OddsBandChart from '@/components/OddsBandChart'
 import DailyPnLChart from '@/components/DailyPnLChart'
 import AddBetModal from '@/components/AddBetModal'
 import BottomNav from '@/components/BottomNav'
+import OpenBetsTable from '@/components/OpenBetsTable'
 
 function BigCard({
   label, value, sub, light = false, valueColor,
@@ -70,13 +71,21 @@ export default function Dashboard() {
         {/* ── Hero bento ──────────────────────────────────────────────────── */}
         <div className="grid-hero">
           <BigCard label="Net P&L" value={fmtPnL(stats.netProfit)} light
+            sub={`settled bets only${stats.pending > 0 ? ` · ${stats.pending} open bet${stats.pending !== 1 ? 's' : ''} not counted` : ''}`}
             valueColor={stats.netProfit >= 0 ? '#1B6B1B' : '#B03020'}
           />
-          <BigCard label="ROI" value={roiStr} sub={`${stats.total} bets placed`}
+          <BigCard label="ROI" value={roiStr}
+            sub={`return on total staked · ${stats.total} bets`}
             valueColor={stats.roi >= 0 ? '#6EC200' : '#E85C2A'}
           />
-          <BigCard label="Hit Rate" value={`${hitRate}%`} sub={`${stats.wins}W · ${stats.losses}L`} light />
-          <BigCard label="Avg Odds" value={avgOdds} sub={`${stats.pending} open · ${fmt(pendingStake)} at risk`} />
+          <BigCard label="Hit Rate" value={`${hitRate}%`}
+            sub={`${stats.wins}W · ${stats.losses}L · how often we win`}
+            light
+          />
+          <BigCard label="Avg Odds"
+            value={avgOdds}
+            sub={`average decimal odds · ${stats.pending > 0 ? `${stats.pending} open · ${fmt(pendingStake)} at risk` : 'no open bets'}`}
+          />
         </div>
 
         {/* ── Pablo vs Alberto ────────────────────────────────────────────── */}
@@ -89,16 +98,31 @@ export default function Dashboard() {
               const total = s.wins + s.losses
               const wr = total > 0 ? ((s.wins / total) * 100).toFixed(0) : '0'
               const rColor = s.roi >= 0 ? '#6EC200' : '#E85C2A'
+              const wins = Math.round(s.wins)
+              const losses = Math.round(s.losses)
               return (
                 <div key={name} style={{
                   background: light ? '#F0EBE0' : '#223022',
                   border: `1px solid ${light ? 'rgba(27,43,27,0.1)' : 'rgba(240,235,224,0.07)'}`,
                   borderRadius: 12, padding: '18px 18px',
                 }}>
-                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6, color: light ? 'rgba(27,43,27,0.4)' : 'rgba(240,235,224,0.4)' }}>{name}</div>
-                  <div className="num" style={{ fontSize: 26, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1, color: rColor }}>{s.roi >= 0 ? '+' : ''}{s.roi.toFixed(1)}%</div>
-                  <div style={{ fontSize: 11, marginTop: 4, color: light ? 'rgba(27,43,27,0.38)' : 'rgba(240,235,224,0.35)' }}>{s.wins}W / {s.losses}L · {wr}%</div>
-                  <div className="num" style={{ fontSize: 16, fontWeight: 800, marginTop: 6, color: rColor }}>{fmtPnL(s.profit)}</div>
+                  <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6, color: light ? 'rgba(27,43,27,0.4)' : 'rgba(240,235,224,0.4)' }}>
+                    {name} · personal picks
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, lineHeight: 1 }}>
+                    <div className="num" style={{ fontSize: 26, fontWeight: 900, letterSpacing: '-0.02em', color: rColor }}>{s.roi >= 0 ? '+' : ''}{s.roi.toFixed(1)}%</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: light ? 'rgba(27,43,27,0.35)' : 'rgba(240,235,224,0.35)' }}>ROI</div>
+                  </div>
+                  <div style={{ fontSize: 10, marginTop: 2, marginBottom: 5, color: light ? 'rgba(27,43,27,0.35)' : 'rgba(240,235,224,0.33)', fontStyle: 'italic' }}>
+                    profit ÷ total staked
+                  </div>
+                  <div style={{ fontSize: 11, color: light ? 'rgba(27,43,27,0.38)' : 'rgba(240,235,224,0.35)' }}>
+                    {wins}W · {losses}L · {wr}% win rate
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 5 }}>
+                    <div className="num" style={{ fontSize: 16, fontWeight: 800, color: rColor }}>{fmtPnL(s.profit)}</div>
+                    <div style={{ fontSize: 10, color: light ? 'rgba(27,43,27,0.35)' : 'rgba(240,235,224,0.33)' }}>net P&L</div>
+                  </div>
                 </div>
               )
             })}
@@ -108,15 +132,18 @@ export default function Dashboard() {
         {/* ── Streak / open / at risk ─────────────────────────────────────── */}
         {(stats.currentStreakType || stats.pending > 0) && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-            <BigCard label="Streak" value={streakStr}
+            <BigCard label="Streak"
+              value={streakStr}
+              sub={stats.currentStreakType ? `consecutive ${stats.currentStreakType}s` : ''}
               valueColor={stats.currentStreakType === 'win' ? '#6EC200' : stats.currentStreakType === 'loss' ? '#E85C2A' : undefined}
             />
-            <BigCard label="Open Bets" value={String(stats.pending)} light />
-            <BigCard label="At Risk" value={fmt(pendingStake)} />
+            <BigCard label="Open Bets" value={String(stats.pending)} sub="waiting for results" light />
+            <BigCard label="At Risk" value={fmt(pendingStake)} sub="total in active bets" />
           </div>
         )}
 
         <StatsCards stats={stats} />
+        <OpenBetsTable bets={bets} />
 
         <div className="grid-bankroll" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 14, alignItems: 'start' }}>
           <BankrollChart data={bankrollData} bankrollStart={bankrollStart} onBankrollStartChange={setBankrollStart} />
