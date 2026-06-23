@@ -56,21 +56,24 @@ function betToRow(b: Omit<Bet, 'id'> | Partial<Bet>): Record<string, unknown> {
 // ── Stats helpers (unchanged logic) ───────────────────────────────────────────
 
 function pickerStats(bets: Bet[], picker: 'pablo' | 'alberto') {
-  let wins = 0, losses = 0, stake = 0, profit = 0
+  let wins = 0, losses = 0, stake = 0, profit = 0, oddsSum = 0, oddsCount = 0
   for (const b of bets) {
     if (b.result !== 'win' && b.result !== 'loss') continue
     const share = b.picker === 'both' ? 0.5 : b.picker === picker ? 1 : 0
     if (share === 0) continue
-    wins   += b.result === 'win'  ? share : 0
-    losses += b.result === 'loss' ? share : 0
-    stake  += b.stake  * share
-    profit += b.profit * share
+    wins      += b.result === 'win'  ? share : 0
+    losses    += b.result === 'loss' ? share : 0
+    stake     += b.stake  * share
+    profit    += b.profit * share
+    oddsSum   += b.odds   * share
+    oddsCount += share
   }
   return {
-    wins:   parseFloat(wins.toFixed(1)),
-    losses: parseFloat(losses.toFixed(1)),
-    roi:    stake > 0 ? (profit / stake) * 100 : 0,
-    profit: parseFloat(profit.toFixed(2)),
+    wins:     parseFloat(wins.toFixed(1)),
+    losses:   parseFloat(losses.toFixed(1)),
+    roi:      stake > 0 ? (profit / stake) * 100 : 0,
+    profit:   parseFloat(profit.toFixed(2)),
+    avgOdds:  oddsCount > 0 ? parseFloat((oddsSum / oddsCount).toFixed(2)) : 0,
   }
 }
 

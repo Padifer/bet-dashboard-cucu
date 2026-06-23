@@ -50,7 +50,9 @@ export default function Dashboard() {
 
   const hitRate = (stats.wins + stats.losses) > 0
     ? ((stats.wins / (stats.wins + stats.losses)) * 100).toFixed(0) : '0'
-  const pendingStake = bets.filter(b => b.result === 'pending').reduce((s, b) => s + b.stake, 0)
+  const pendingBets = bets.filter(b => b.result === 'pending')
+  const pendingStake = pendingBets.reduce((s, b) => s + b.stake, 0)
+  const pendingPotentialReturn = pendingBets.reduce((s, b) => s + b.stake * b.odds, 0)
   const settledBets = bets.filter(b => b.result === 'win' || b.result === 'loss')
   const avgOdds = settledBets.length > 0
     ? (settledBets.reduce((s, b) => s + b.odds, 0) / settledBets.length).toFixed(2) : '—'
@@ -119,6 +121,11 @@ export default function Dashboard() {
                   <div style={{ fontSize: 11, color: light ? 'rgba(27,43,27,0.38)' : 'rgba(240,235,224,0.35)' }}>
                     {wins}W · {losses}L · {wr}% win rate
                   </div>
+                  {s.avgOdds > 0 && (
+                    <div style={{ fontSize: 11, marginTop: 2, color: light ? 'rgba(27,43,27,0.32)' : 'rgba(240,235,224,0.28)' }}>
+                      avg odd {s.avgOdds.toFixed(2)}
+                    </div>
+                  )}
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 5 }}>
                     <div className="num" style={{ fontSize: 16, fontWeight: 800, color: rColor }}>{fmtPnL(s.profit)}</div>
                     <div style={{ fontSize: 10, color: light ? 'rgba(27,43,27,0.35)' : 'rgba(240,235,224,0.33)' }}>net P&L</div>
@@ -138,7 +145,9 @@ export default function Dashboard() {
               valueColor={stats.currentStreakType === 'win' ? '#6EC200' : stats.currentStreakType === 'loss' ? '#E85C2A' : undefined}
             />
             <BigCard label="Open Bets" value={String(stats.pending)} sub="waiting for results" light />
-            <BigCard label="At Risk" value={fmt(pendingStake)} sub="total in active bets" />
+            <BigCard label="At Risk" value={fmt(pendingStake)}
+              sub={pendingPotentialReturn > 0 ? `→ could return ${fmt(pendingPotentialReturn)}` : 'total in active bets'}
+            />
           </div>
         )}
 

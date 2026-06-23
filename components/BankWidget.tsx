@@ -28,6 +28,11 @@ export default function BankWidget({ transactions, onAdd, onDelete, onDeleteGrou
   const sorted = [...transactions].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
   const handleDelete = (tx: BankTransaction) => {
+    if (tx.type === 'settlement') {
+      if (!window.confirm('Undo this settlement?')) return
+      onDelete(tx.id)
+      return
+    }
     if (tx.type === 'debt') {
       if (!window.confirm('Delete this debt?')) return
       onDelete(tx.id)
@@ -72,27 +77,30 @@ export default function BankWidget({ transactions, onAdd, onDelete, onDeleteGrou
           {expanded && sorted.length > 0 && (
             <div style={{ borderTop: '1px solid rgba(240,235,224,0.05)', padding: '8px 16px 14px', display: 'flex', flexDirection: 'column', gap: 5 }}>
               {sorted.map(tx => {
-                const isDebt    = tx.type === 'debt'
-                const isDeposit = tx.type === 'deposit'
-                const isPaired  = !!tx.groupId
-                const amtColor  = isDebt ? '#F5C842' : isDeposit ? '#6EC200' : '#E85C2A'
+                const isDebt       = tx.type === 'debt'
+                const isSettlement = tx.type === 'settlement'
+                const isDeposit    = tx.type === 'deposit'
+                const isPaired     = !!tx.groupId
+                const amtColor     = isSettlement ? '#6EC200' : isDebt ? '#F5C842' : isDeposit ? '#6EC200' : '#E85C2A'
                 return (
                   <div key={tx.id} style={{
                     display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
                     padding: '8px 12px', borderRadius: 8,
-                    background: 'rgba(240,235,224,0.03)',
-                    border: `1px solid rgba(240,235,224,0.06)`,
+                    background: isSettlement ? 'rgba(110,194,0,0.05)' : 'rgba(240,235,224,0.03)',
+                    border: `1px solid ${isSettlement ? 'rgba(110,194,0,0.15)' : 'rgba(240,235,224,0.06)'}`,
                   }}>
-                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: amtColor, minWidth: 48 }}>
-                      {isDebt ? 'Debt' : isDeposit ? 'In' : 'Out'}
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: amtColor, minWidth: 60 }}>
+                      {isSettlement ? 'Settled' : isDebt ? 'Debt' : isDeposit ? 'In' : 'Out'}
                     </span>
                     <span style={{ fontSize: 12, color: 'var(--color-muted)', minWidth: 70 }}>
-                      {isDebt
+                      {isSettlement
+                        ? `${tx.person} paid`
+                        : isDebt
                         ? `${tx.person} → ${tx.debtCreditor}`
                         : `${tx.person}${isPaired ? ' · 50%' : ''}`}
                     </span>
                     <span className="num" style={{ fontSize: 14, fontWeight: 800, color: amtColor }}>
-                      {isDebt ? '' : isDeposit ? '+' : '−'}{fmt(tx.amount)}
+                      {isSettlement ? '' : isDebt ? '' : isDeposit ? '+' : '−'}{fmt(tx.amount)}
                     </span>
                     {tx.note && (
                       <span style={{ fontSize: 12, color: 'var(--color-muted)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: 0.7 }}>

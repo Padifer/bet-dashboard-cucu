@@ -11,11 +11,10 @@ import AddTransactionModal from '@/components/AddTransactionModal'
 import { Bet } from '@/types/bet'
 import { fmt } from '@/utils/currency'
 
-// Exact same BigCard as the dashboard
 function BigCard({
-  label, value, sub, light = false, valueColor, onClick,
+  label, value, sub, lines, light = false, valueColor, onClick,
 }: {
-  label: string; value: string; sub?: string
+  label: string; value: string; sub?: string; lines?: string[]
   light?: boolean; valueColor?: string; onClick?: () => void
 }) {
   const bg           = light ? '#F0EBE0' : '#223022'
@@ -37,7 +36,12 @@ function BigCard({
     >
       <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: labelColor, marginBottom: 10 }}>{label}</div>
       <div className="num" style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1, color: valueColor ?? defaultValue }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, marginTop: 8, color: subColor }}>{sub}</div>}
+      {lines && (
+        <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {lines.map((l, i) => <div key={i} style={{ fontSize: 11, color: subColor }}>{l}</div>)}
+        </div>
+      )}
+      {sub && !lines && <div style={{ fontSize: 11, marginTop: 8, color: subColor }}>{sub}</div>}
     </div>
   )
 }
@@ -61,10 +65,10 @@ export default function BankPage() {
   const adjustedPabloTotal   = pabloTotal   + bankFundedImpact / 2
   const adjustedAlbertoTotal = albertoTotal + bankFundedImpact / 2
 
-  const bankColor  = adjustedBankTotal >= 0 ? '#1B6B1B' : '#B03020'
+  const bankColor = adjustedBankTotal >= 0 ? '#1B6B1B' : '#B03020'
 
   // Shared-fund view: treat all deposits as pooled, each person owns 50%
-  const cashTxs = transactions.filter(t => t.type !== 'debt')
+  const cashTxs = transactions.filter(t => t.type !== 'debt' && t.type !== 'settlement')
   const totalDeposited  = cashTxs.filter(t => t.type === 'deposit').reduce((s, t) => s + t.amount, 0)
   const totalWithdrawn  = cashTxs.filter(t => t.type === 'withdrawal').reduce((s, t) => s + t.amount, 0)
   const eachContributed = (totalDeposited - totalWithdrawn) / 2   // fair share of net deposits
@@ -72,7 +76,6 @@ export default function BankPage() {
   const eachProfit      = parseFloat((eachShareNow - eachContributed).toFixed(2))
   const shareColor      = eachShareNow >= eachContributed ? '#6EC200' : '#E85C2A'
   const pendingStake    = bets.filter(b => b.result === 'pending').reduce((s, b) => s + b.stake, 0)
-  const eachLost        = bets.filter(b => b.result === 'loss').reduce((s, b) => s + b.stake, 0) / 2
 
   function openTx(type: 'deposit' | 'withdrawal') {
     setTxType(type); setShowTxModal(true)
@@ -88,43 +91,56 @@ export default function BankPage() {
         display: 'flex', flexDirection: 'column', gap: 12,
       }}>
 
-        {/* ── Row 1: bento balance grid (same pattern as dashboard) ──────── */}
+        {/* ── Row 1: bento balance grid ──────────────────────────────────── */}
         <div className="grid-bank-hero">
           <BigCard
             label="Bank Balance"
-            value={loaded ? fmt(adjustedBankTotal) : '…'}
-            sub={loaded ? `${cashTxs.length} transactions · ${bankFundedImpact !== 0 ? (bankFundedImpact > 0 ? `+${fmt(bankFundedImpact)} from bets` : `${fmt(bankFundedImpact)} in bets`) : 'no bets impact'}` : undefined}
+            value={loaded ? `${adjustedBankTotal < 0 ? '-' : ''}${fmt(Math.abs(adjustedBankTotal))}` : '…'}
+            lines={loaded ? [
+              `Deposited  ${fmt(totalDeposited)}  (${cashTxs.length} transaction${cashTxs.length !== 1 ? 's' : ''})`,
+              bankFundedImpact !== 0
+                ? `Bets impact  ${bankFundedImpact > 0 ? '+' : '-'}${fmt(Math.abs(bankFundedImpact))}`
+                : 'no bets placed yet',
+            ] : undefined}
             light
             valueColor={bankColor}
           />
           <BigCard
             label="Pablo"
-            value={loaded ? fmt(eachShareNow) : '…'}
-            sub={loaded ? `${fmt(eachContributed)} in · ${eachProfit >= 0 ? '+' : ''}${fmt(eachProfit)} profit${eachLost > 0 ? ` · -${fmt(eachLost)} lost` : ''}${pendingStake > 0 ? ` · ${fmt(pendingStake / 2)} at risk` : ''}` : undefined}
+            value={loaded ? `${eachShareNow < 0 ? '-' : ''}${fmt(Math.abs(eachShareNow))}` : '…'}
+            lines={loaded ? [
+              `Pool share  ${fmt(eachContributed)}`,
+              `Bets P&L  ${eachProfit >= 0 ? '+' : '-'}${fmt(Math.abs(eachProfit))}`,
+              ...(pendingStake > 0 ? [`At risk  ${fmt(pendingStake / 2)}`] : []),
+            ] : undefined}
             valueColor={shareColor}
           />
           <BigCard
             label="Alberto"
-            value={loaded ? fmt(eachShareNow) : '…'}
-            sub={loaded ? `${fmt(eachContributed)} in · ${eachProfit >= 0 ? '+' : ''}${fmt(eachProfit)} profit${eachLost > 0 ? ` · -${fmt(eachLost)} lost` : ''}${pendingStake > 0 ? ` · ${fmt(pendingStake / 2)} at risk` : ''}` : undefined}
+            value={loaded ? `${eachShareNow < 0 ? '-' : ''}${fmt(Math.abs(eachShareNow))}` : '…'}
+            lines={loaded ? [
+              `Pool share  ${fmt(eachContributed)}`,
+              `Bets P&L  ${eachProfit >= 0 ? '+' : '-'}${fmt(Math.abs(eachProfit))}`,
+              ...(pendingStake > 0 ? [`At risk  ${fmt(pendingStake / 2)}`] : []),
+            ] : undefined}
             light
             valueColor={eachShareNow >= eachContributed ? '#1B6B1B' : '#B03020'}
           />
         </div>
 
-        {/* ── Row 2: action cards (same grid, same visual weight) ────────── */}
+        {/* ── Row 2: action cards ───────────────────────────────────────── */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <BigCard
             label="Deposit"
             value="+"
-            sub="Add funds to the bank"
+            sub="Add funds to the shared pool"
             valueColor="#6EC200"
             onClick={() => openTx('deposit')}
           />
           <BigCard
             label="Withdraw"
             value="−"
-            sub="Remove funds from the bank"
+            sub="Take funds out of the pool"
             light
             valueColor="#B03020"
             onClick={() => openTx('withdrawal')}
@@ -134,7 +150,19 @@ export default function BankPage() {
         {/* ── Settlement + history ───────────────────────────────────────── */}
         {loaded && (
           <>
-            <BalancesWidget bets={bets} transactions={transactions} />
+            <BalancesWidget
+              bets={bets}
+              transactions={transactions}
+              onSettle={async (amount, debtor) => {
+                await addTransaction({
+                  type: 'settlement',
+                  person: debtor,
+                  amount,
+                  note: 'Settlement paid',
+                  createdAt: new Date().toISOString(),
+                })
+              }}
+            />
             <BankWidget
               transactions={transactions}
               total={adjustedBankTotal}

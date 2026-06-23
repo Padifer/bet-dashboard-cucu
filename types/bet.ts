@@ -48,8 +48,8 @@ export interface BetStats {
   total: number
   currentStreak: number
   currentStreakType: 'win' | 'loss' | null
-  pabloStats: { wins: number; losses: number; roi: number; profit: number }
-  albertoStats: { wins: number; losses: number; roi: number; profit: number }
+  pabloStats: { wins: number; losses: number; roi: number; profit: number; avgOdds: number }
+  albertoStats: { wins: number; losses: number; roi: number; profit: number; avgOdds: number }
 }
 
 export interface CompetitionStat {

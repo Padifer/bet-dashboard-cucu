@@ -72,7 +72,7 @@ export function useBankAccount() {
   }
 
   const sign      = (t: BankTransaction) => (t.type === 'deposit' ? 1 : -1)
-  const bankTxs   = transactions.filter(t => t.type !== 'debt')
+  const bankTxs   = transactions.filter(t => t.type !== 'debt' && t.type !== 'settlement')
   const total       = bankTxs.reduce((s, t) => s + sign(t) * t.amount, 0)
   const pabloTotal  = bankTxs.filter(t => t.person === 'Pablo').reduce((s, t) => s + sign(t) * t.amount, 0)
   const albertoTotal = bankTxs.filter(t => t.person === 'Alberto').reduce((s, t) => s + sign(t) * t.amount, 0)

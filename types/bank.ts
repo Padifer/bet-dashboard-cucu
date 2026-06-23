@@ -1,4 +1,4 @@
-export type TransactionType = 'deposit' | 'withdrawal' | 'debt'
+export type TransactionType = 'deposit' | 'withdrawal' | 'debt' | 'settlement'
 export type TransactionPerson = 'Pablo' | 'Alberto'
 
 export interface BankTransaction {
