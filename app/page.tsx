@@ -60,6 +60,22 @@ export default function Dashboard() {
     ? `${stats.currentStreakType === 'win' ? '↑' : '↓'} ${stats.currentStreak}` : '—'
   const roiStr = `${stats.roi >= 0 ? '+' : ''}${stats.roi.toFixed(1)}%`
 
+  // Break-even: wins needed to recover current loss at avg stake × avg odds
+  const winsToBreakEven = stats.netProfit < 0 && settledBets.length > 0
+    ? (() => {
+        const avgStakeVal = stats.totalStake / settledBets.length
+        const avgOddsNum  = settledBets.reduce((s, b) => s + b.odds, 0) / settledBets.length
+        const avgNetPerWin = avgStakeVal * (avgOddsNum - 1)
+        return avgNetPerWin > 0 ? Math.ceil(Math.abs(stats.netProfit) / avgNetPerWin) : null
+      })()
+    : null
+
+  // Days since last win
+  const lastWinBet = [...bets].filter(b => b.result === 'win').sort((a, b) => b.date.localeCompare(a.date))[0]
+  const daysSinceWin = lastWinBet
+    ? Math.floor((Date.now() - new Date(lastWinBet.date).getTime()) / 86_400_000)
+    : null
+
   return (
     <>
       <Navbar onAddBet={() => setShowModal(true)} />
@@ -148,6 +164,29 @@ export default function Dashboard() {
             <BigCard label="At Risk" value={fmt(pendingStake)}
               sub={pendingPotentialReturn > 0 ? `→ could return ${fmt(pendingPotentialReturn)}` : 'total in active bets'}
             />
+          </div>
+        )}
+
+        {/* ── Break-even + days since last win ────────────────────────────── */}
+        {(winsToBreakEven !== null || daysSinceWin !== null) && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {winsToBreakEven !== null && (
+              <BigCard
+                label="Break Even"
+                value={`${winsToBreakEven} wins`}
+                sub={`needed at avg stake & odds to recover ${fmt(Math.abs(stats.netProfit))}`}
+                valueColor="#E85C2A"
+              />
+            )}
+            {daysSinceWin !== null && (
+              <BigCard
+                label="Last Win"
+                value={daysSinceWin === 0 ? 'today' : `${daysSinceWin}d ago`}
+                sub={`${lastWinBet!.match} · ${lastWinBet!.date}`}
+                light={daysSinceWin <= 2}
+                valueColor={daysSinceWin <= 2 ? '#1B6B1B' : daysSinceWin >= 7 ? '#E85C2A' : undefined}
+              />
+            )}
           </div>
         )}
 
