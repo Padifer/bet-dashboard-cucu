@@ -204,6 +204,91 @@ function BetCard({ bet, onEdit, onDelete, onSettle, onUndo }: {
 
 type FilterResult = 'all' | 'win' | 'loss' | 'pending'
 type SortBy = 'date' | 'profit' | 'odds'
+type ViewMode = 'cards' | 'table'
+
+const RESULT_DOT: Record<string, string> = { win: '#6EC200', loss: '#E85C2A', pending: '#FBBA24', void: '#94A3B8' }
+
+function BetsTableView({ bets, onEdit, onSettle, onUndo }: {
+  bets: Bet[]
+  onEdit: (b: Bet) => void
+  onSettle: (id: string, r: 'win' | 'loss' | 'void') => void
+  onUndo: (id: string) => void
+}) {
+  const TH: React.CSSProperties = {
+    fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+    color: 'rgba(240,235,224,0.3)', padding: '7px 10px', whiteSpace: 'nowrap', textAlign: 'left',
+  }
+  return (
+    <div style={{ background: '#223022', border: '1px solid rgba(240,235,224,0.07)', borderRadius: 12, overflow: 'hidden' }}>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid rgba(240,235,224,0.07)' }}>
+              <th style={{ ...TH }}>Date</th>
+              <th style={{ ...TH }}>Match</th>
+              <th style={{ ...TH }}>Pick</th>
+              <th style={{ ...TH, textAlign: 'right' }}>Odds</th>
+              <th style={{ ...TH, textAlign: 'right' }}>Stake</th>
+              <th style={{ ...TH, textAlign: 'right' }}>P&L</th>
+              <th style={{ ...TH }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bets.map((bet, i) => {
+              const pnl = bet.result === 'pending'
+                ? parseFloat(((bet.stake * bet.odds) - bet.stake).toFixed(2))
+                : bet.profit
+              const pnlColor = bet.result === 'pending' ? 'rgba(240,235,224,0.35)' : bet.profit >= 0 ? '#6EC200' : '#E85C2A'
+              const dot = RESULT_DOT[bet.result] ?? '#94A3B8'
+              return (
+                <tr key={bet.id} style={{ borderBottom: i < bets.length - 1 ? '1px solid rgba(240,235,224,0.04)' : 'none' }}>
+                  <td style={{ padding: '8px 10px', color: 'rgba(240,235,224,0.4)', whiteSpace: 'nowrap', fontSize: 11 }}>
+                    <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: dot, marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }} />
+                    {bet.date.slice(5)}
+                  </td>
+                  <td style={{ padding: '8px 10px', maxWidth: 180 }}>
+                    <div style={{ fontWeight: 600, color: '#F0EBE0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 170 }}>{bet.match}</div>
+                    <div style={{ fontSize: 10, color: 'rgba(240,235,224,0.32)', marginTop: 1 }}>{bet.league.replace('UEFA ', '').replace('FIFA ', '')}</div>
+                  </td>
+                  <td style={{ padding: '8px 10px', maxWidth: 160 }}>
+                    <div style={{ color: 'rgba(240,235,224,0.75)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 150 }}>{bet.prediction}</div>
+                    <div style={{ fontSize: 10, color: 'rgba(240,235,224,0.3)', marginTop: 1 }}>{bet.betType}</div>
+                  </td>
+                  <td style={{ padding: '8px 10px', textAlign: 'right', color: 'rgba(240,235,224,0.6)', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                    {bet.odds.toFixed(2)}
+                  </td>
+                  <td style={{ padding: '8px 10px', textAlign: 'right', color: 'rgba(240,235,224,0.6)', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                    {fmt(bet.stake)}
+                  </td>
+                  <td style={{ padding: '8px 10px', textAlign: 'right', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                    <span className="num" style={{ fontWeight: 700, color: pnlColor }}>
+                      {bet.result === 'pending' ? `+${fmt(pnl)}?` : fmtPnL(pnl)}
+                    </span>
+                  </td>
+                  <td style={{ padding: '6px 10px', whiteSpace: 'nowrap' }}>
+                    {bet.result === 'pending' ? (
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <button onClick={() => onSettle(bet.id, 'win')} style={{ padding: '3px 8px', borderRadius: 5, fontSize: 11, fontWeight: 700, cursor: 'pointer', background: 'rgba(110,194,0,0.12)', border: '1px solid rgba(110,194,0,0.35)', color: '#6EC200' }}>W</button>
+                        <button onClick={() => onSettle(bet.id, 'loss')} style={{ padding: '3px 8px', borderRadius: 5, fontSize: 11, fontWeight: 700, cursor: 'pointer', background: 'rgba(232,92,42,0.12)', border: '1px solid rgba(232,92,42,0.35)', color: '#E85C2A' }}>L</button>
+                        <button onClick={() => onSettle(bet.id, 'void')} style={{ padding: '3px 7px', borderRadius: 5, fontSize: 11, cursor: 'pointer', background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.1)', color: 'rgba(240,235,224,0.4)' }}>V</button>
+                        <button onClick={() => onEdit(bet)} style={{ padding: '3px 7px', borderRadius: 5, fontSize: 11, cursor: 'pointer', background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.2)', color: 'var(--color-accent)' }}>✎</button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <button onClick={() => onUndo(bet.id)} style={{ padding: '3px 8px', borderRadius: 5, fontSize: 11, cursor: 'pointer', background: 'rgba(245,200,66,0.1)', border: '1px solid rgba(245,200,66,0.25)', color: '#F5C842' }}>↩</button>
+                        <button onClick={() => onEdit(bet)} style={{ padding: '3px 7px', borderRadius: 5, fontSize: 11, cursor: 'pointer', background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.2)', color: 'var(--color-accent)' }}>✎</button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
 
 export default function BetsPage() {
   const { bets, addBet, deleteBet, updateBet, settleBet, loaded, stats } = useBets()
@@ -213,6 +298,7 @@ export default function BetsPage() {
   const [filter, setFilter]         = useState<FilterResult>('all')
   const [sortBy, setSortBy]         = useState<SortBy>('date')
   const [dateRange, setDateRange]   = useState<'all' | '30d' | '90d'>('all')
+  const [viewMode, setViewMode]     = useState<ViewMode>('table')
 
   if (!loaded) return (
     <>
@@ -291,12 +377,23 @@ export default function BetsPage() {
                 </button>
               )
             })}
-            <select value={sortBy} onChange={e => setSortBy(e.target.value as SortBy)}
-              style={{ marginLeft: 'auto', padding: '5px 10px', borderRadius: 8, fontSize: 12, background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.08)', color: 'var(--color-muted)', cursor: 'pointer', outline: 'none' }}>
-              <option value="date">↓ Date</option>
-              <option value="profit">↓ Profit</option>
-              <option value="odds">↓ Odds</option>
-            </select>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 4, alignItems: 'center' }}>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value as SortBy)}
+                style={{ padding: '5px 10px', borderRadius: 8, fontSize: 12, background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.08)', color: 'var(--color-muted)', cursor: 'pointer', outline: 'none' }}>
+                <option value="date">↓ Date</option>
+                <option value="profit">↓ Profit</option>
+                <option value="odds">↓ Odds</option>
+              </select>
+              <div style={{ display: 'flex', background: 'rgba(240,235,224,0.04)', border: '1px solid rgba(240,235,224,0.08)', borderRadius: 8, overflow: 'hidden' }}>
+                {(['table', 'cards'] as ViewMode[]).map(v => (
+                  <button key={v} onClick={() => setViewMode(v)} style={{
+                    padding: '5px 10px', fontSize: 13, cursor: 'pointer', border: 'none',
+                    background: viewMode === v ? 'rgba(129,140,248,0.18)' : 'transparent',
+                    color: viewMode === v ? 'var(--color-accent)' : 'var(--color-muted)',
+                  }}>{v === 'table' ? '☰' : '⊞'}</button>
+                ))}
+              </div>
+            </div>
           </div>
           {/* Row 2: date range filters */}
           <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -316,7 +413,7 @@ export default function BetsPage() {
       </div>
 
       <main className="page-main" style={{
-        maxWidth: 700, margin: '0 auto',
+        maxWidth: viewMode === 'table' ? 1100 : 700, margin: '0 auto',
         padding: '16px 16px 100px',
         display: 'flex', flexDirection: 'column', gap: 12,
       }}>
@@ -324,6 +421,13 @@ export default function BetsPage() {
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-muted)' }}>
             No bets {filter !== 'all' ? 'in this category' : 'yet — add your first one!'}
           </div>
+        ) : viewMode === 'table' ? (
+          <BetsTableView
+            bets={filtered}
+            onEdit={setEditingBet}
+            onSettle={settleBet}
+            onUndo={undo}
+          />
         ) : (
           filtered.map(bet => (
             <BetCard
