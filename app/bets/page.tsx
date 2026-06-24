@@ -227,19 +227,27 @@ function BetsTableView({ bets, onEdit, onSettle, onUndo }: {
               <th style={{ ...TH }}>Date</th>
               <th style={{ ...TH }}>Match</th>
               <th style={{ ...TH }}>Pick</th>
+              <th style={{ ...TH }}>Picker</th>
               <th style={{ ...TH, textAlign: 'right' }}>Odds</th>
               <th style={{ ...TH, textAlign: 'right' }}>Stake</th>
-              <th style={{ ...TH, textAlign: 'right' }}>P&L</th>
+              <th style={{ ...TH, textAlign: 'right' }}>Return</th>
+              <th style={{ ...TH, textAlign: 'right' }}>Profit</th>
               <th style={{ ...TH }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {bets.map((bet, i) => {
-              const pnl = bet.result === 'pending'
+              const totalReturn = bet.result === 'loss' ? 0
+                : bet.result === 'void' ? bet.stake
+                : parseFloat((bet.stake * bet.odds).toFixed(2))
+              const profit = bet.result === 'pending'
                 ? parseFloat(((bet.stake * bet.odds) - bet.stake).toFixed(2))
                 : bet.profit
-              const pnlColor = bet.result === 'pending' ? 'rgba(240,235,224,0.35)' : bet.profit >= 0 ? '#6EC200' : '#E85C2A'
+              const profitColor = bet.result === 'pending' ? 'rgba(240,235,224,0.35)' : bet.profit >= 0 ? '#6EC200' : '#E85C2A'
+              const returnColor = bet.result === 'pending' ? 'rgba(240,235,224,0.35)' : bet.result === 'win' ? '#6EC200' : 'rgba(240,235,224,0.4)'
               const dot = RESULT_DOT[bet.result] ?? '#94A3B8'
+              const pickerLabel = bet.picker === 'pablo' ? 'P' : bet.picker === 'alberto' ? 'A' : bet.picker === 'both' ? 'P+A' : '—'
+              const pickerColor = bet.picker === 'pablo' ? '#F0EBE0' : bet.picker === 'alberto' ? '#6EC200' : 'rgba(240,235,224,0.4)'
               return (
                 <tr key={bet.id} style={{ borderBottom: i < bets.length - 1 ? '1px solid rgba(240,235,224,0.04)' : 'none' }}>
                   <td style={{ padding: '8px 10px', color: 'rgba(240,235,224,0.4)', whiteSpace: 'nowrap', fontSize: 11 }}>
@@ -254,6 +262,9 @@ function BetsTableView({ bets, onEdit, onSettle, onUndo }: {
                     <div style={{ color: 'rgba(240,235,224,0.75)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 150 }}>{bet.prediction}</div>
                     <div style={{ fontSize: 10, color: 'rgba(240,235,224,0.3)', marginTop: 1 }}>{bet.betType}</div>
                   </td>
+                  <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: pickerColor }}>{pickerLabel}</span>
+                  </td>
                   <td style={{ padding: '8px 10px', textAlign: 'right', color: 'rgba(240,235,224,0.6)', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
                     {bet.odds.toFixed(2)}
                   </td>
@@ -261,8 +272,13 @@ function BetsTableView({ bets, onEdit, onSettle, onUndo }: {
                     {fmt(bet.stake)}
                   </td>
                   <td style={{ padding: '8px 10px', textAlign: 'right', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-                    <span className="num" style={{ fontWeight: 700, color: pnlColor }}>
-                      {bet.result === 'pending' ? `+${fmt(pnl)}?` : fmtPnL(pnl)}
+                    <span className="num" style={{ fontWeight: 600, color: returnColor }}>
+                      {bet.result === 'pending' ? `${fmt(totalReturn)}?` : fmt(totalReturn)}
+                    </span>
+                  </td>
+                  <td style={{ padding: '8px 10px', textAlign: 'right', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                    <span className="num" style={{ fontWeight: 700, color: profitColor }}>
+                      {bet.result === 'pending' ? `+${fmt(profit)}?` : fmtPnL(profit)}
                     </span>
                   </td>
                   <td style={{ padding: '6px 10px', whiteSpace: 'nowrap' }}>
